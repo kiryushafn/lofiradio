@@ -192,6 +192,17 @@
       font-size: 0.95rem;
     }
 
+    #custom-minutes {
+      width: 60px;
+      padding: 6px;
+      background: var(--input-bg);
+      color: var(--text-color);
+      border: 1px solid var(--track-border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
     #countdown {
       margin-top: 8px;
       font-size: 0.85rem;
@@ -368,7 +379,9 @@
           <option value="1800">30 мин</option>
           <option value="2700">45 мин</option>
           <option value="3600">60 мин</option>
+          <option value="custom">Своё время</option>
         </select>
+        <input type="number" id="custom-minutes" min="1" max="240" value="30" placeholder="мин" style="display: none;">
       </div>
     </div>
 
@@ -406,35 +419,36 @@
   </div>
 
   <script>
-    // === Тема ===
+    // === Тема (исправлено для мобильных) ===
     const body = document.body;
     const themeToggle = document.getElementById('theme-toggle');
     const savedTheme = localStorage.getItem('lofi-theme') || 'dark';
     
     if (savedTheme === 'light') {
-      body.classList.remove('dark-theme');
-      body.classList.add('light-theme');
+      body.classList.replace('dark-theme', 'light-theme');
       themeToggle.textContent = '🌙';
     } else {
+      body.classList.replace('light-theme', 'dark-theme');
       themeToggle.textContent = '🌓';
     }
 
     themeToggle.addEventListener('click', () => {
       if (body.classList.contains('light-theme')) {
-        body.className = 'dark-theme';
+        body.classList.replace('light-theme', 'dark-theme');
         localStorage.setItem('lofi-theme', 'dark');
         themeToggle.textContent = '🌓';
       } else {
-        body.className = 'light-theme';
+        body.classList.replace('dark-theme', 'light-theme');
         localStorage.setItem('lofi-theme', 'light');
         themeToggle.textContent = '🌙';
       }
     });
 
-    // === Таймер сна ===
+    // === Таймер сна с кастомным временем ===
     let sleepTimeout = null;
     let sleepEndTime = null;
     const sleepSelect = document.getElementById('sleep-select');
+    const customMinutesInput = document.getElementById('custom-minutes');
     const countdownEl = document.getElementById('countdown');
 
     function formatTime(seconds) {
@@ -461,6 +475,12 @@
       setTimeout(updateCountdown, 1000);
     }
 
+    function stopMusicForSleep() {
+      sendPlayerCommand('stopVideo');
+      countdownEl.textContent = '💤 Музыка выключена по таймеру';
+      sleepEndTime = null;
+    }
+
     function setSleepTimer(seconds) {
       if (sleepTimeout) clearTimeout(sleepTimeout);
       if (seconds <= 0) {
@@ -473,17 +493,25 @@
       updateCountdown();
     }
 
-    function stopMusicForSleep() {
-      // Останавливаем видео
-      sendPlayerCommand('stopVideo');
-      // Скрываем кнопку, но не показываем снова — просто тишина
-      countdownEl.textContent = '💤 Музыка выключена по таймеру';
-      sleepEndTime = null;
-    }
-
     sleepSelect.addEventListener('change', () => {
-      const seconds = parseInt(sleepSelect.value);
-      setSleepTimer(seconds);
+      if (sleepSelect.value === 'custom') {
+        customMinutesInput.style.display = 'inline-block';
+        customMinutesInput.focus();
+        // Применить текущее значение
+        const mins = parseInt(customMinutesInput.value) || 30;
+        setSleepTimer(mins * 60);
+      } else {
+        customMinutesInput.style.display = 'none';
+        const seconds = parseInt(sleepSelect.value);
+        setSleepTimer(seconds);
+      }
+    });
+
+    customMinutesInput.addEventListener('input', () => {
+      let mins = parseInt(customMinutesInput.value) || 0;
+      mins = Math.min(Math.max(mins, 1), 240); // от 1 до 240 минут
+      customMinutesInput.value = mins;
+      setSleepTimer(mins * 60);
     });
 
     // === Плеер и громкость ===
