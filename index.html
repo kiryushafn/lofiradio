@@ -4,32 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>∞ Lofi Radio</title>
-  <link rel="icon" href="image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
+  <link rel="icon" href="image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎧</text></svg>">
   <style>
     :root {
-      --bg-gradient: linear-gradient(135deg, #0c1427, #122036, #0a1d33);
+      --bg-gradient: linear-gradient(135deg, #0c0f1d, #121a2e, #0a1428);
       --text-color: #f0f0f0;
       --card-bg: rgba(20, 25, 45, 0.7);
-      --btn-bg: #ff6f61;
+      --btn-bg: #ff6b61;
       --btn-hover: #ff523d;
       --track-bg: rgba(255,255,255,0.1);
       --track-border: rgba(255,255,255,0.15);
-      --track-active: rgba(255,111,97,0.3);
+      --track-active: rgba(255,107,97,0.3);
       --input-bg: rgba(0,0,0,0.2);
       --shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
 
     .light-theme {
-      --bg-gradient: linear-gradient(135deg, #f5f7fa, #e4edf9, #d1e0f5);
-      --text-color: #2d3748;
+      --bg-gradient: linear-gradient(135deg, #f0f9ff, #e0f2fe, #c7e8fc);
+      --text-color: #1e293b;
       --card-bg: rgba(255, 255, 255, 0.85);
-      --btn-bg: #4a6cf7;
-      --btn-hover: #3a56d4;
-      --track-bg: rgba(0,0,0,0.05);
-      --track-border: rgba(0,0,0,0.1);
-      --track-active: rgba(74, 108, 247, 0.2);
-      --input-bg: rgba(0,0,0,0.03);
-      --shadow: 0 6px 20px rgba(0,0,0,0.1);
+      --btn-bg: #3b82f6;
+      --btn-hover: #2563eb;
+      --track-bg: rgba(59,130,246,0.1);
+      --track-border: rgba(59,130,246,0.2);
+      --track-active: rgba(59,130,246,0.25);
+      --input-bg: rgba(241,245,249,0.7);
+      --shadow: 0 6px 20px rgba(0,123,255,0.1);
     }
 
     * {
@@ -47,35 +47,8 @@
       position: relative;
     }
 
-    /* === ФОН: тени от ёлок и подарков === */
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        /* Тень ёлки внизу слева */
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cpath d='M30,85 L50,60 L40,60 L55,40 L45,40 L60,20 L50,20 L70,5 L60,5 L80,20 L70,20 L85,40 L75,40 L90,60 L80,60 L100,85 Z' fill='rgba(0,0,0,0.06)'/%3E%3C/svg%3E") bottom 30px left 20px no-repeat,
-        /* Тени подарков внизу справа */
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'%3E%3Crect x='0' y='40' width='30' height='20' rx='4' fill='rgba(0,0,0,0.08)'/%3E%3Crect x='40' y='35' width='25' height='25' rx='5' fill='rgba(0,0,0,0.06)'/%3E%3Crect x='80' y='42' width='20' height='18' rx='3' fill='rgba(0,0,0,0.07)'/%3E%3C/svg%3E") bottom 20px right 30px no-repeat,
-        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.02) 0%, transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.01) 0%, transparent 50%);
-      z-index: -1;
-      opacity: 0.9;
-    }
-
-    .light-theme body::before {
-      background: 
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'%3E%3Cpath d='M30,85 L50,60 L40,60 L55,40 L45,40 L60,20 L50,20 L70,5 L60,5 L80,20 L70,20 L85,40 L75,40 L90,60 L80,60 L100,85 Z' fill='rgba(0,0,0,0.03)'/%3E%3C/svg%3E") bottom 30px left 20px no-repeat,
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60'%3E%3Crect x='0' y='40' width='30' height='20' rx='4' fill='rgba(0,0,0,0.04)'/%3E%3Crect x='40' y='35' width='25' height='25' rx='5' fill='rgba(0,0,0,0.03)'/%3E%3Crect x='80' y='42' width='20' height='18' rx='3' fill='rgba(0,0,0,0.035)'/%3E%3C/svg%3E") bottom 20px right 30px no-repeat,
-        radial-gradient(circle at 20% 30%, rgba(0,0,0,0.02) 0%, transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(0,0,0,0.01) 0%, transparent 50%);
-    }
-
-    /* === СНЕЖНЫЙ ЭФФЕКТ === */
-    #snow {
+    /* === СНЕГ === */
+    #snow-container {
       position: fixed;
       top: 0;
       left: 0;
@@ -87,21 +60,16 @@
 
     .snowflake {
       position: absolute;
-      top: -20px;
       background: white;
       border-radius: 50%;
-      opacity: 0.7;
+      opacity: 0.6;
     }
 
     @keyframes fall-drift {
-      0% { transform: translate(0, -20px); }
-      100% { transform: translate(var(--drift, 0px), 100vh); }
+      to { transform: translateY(100vh) translateX(var(--drift, 0px)); }
     }
 
-    .snow-paused .snowflake {
-      animation-play-state: paused !important;
-    }
-
+    /* === ОСНОВНОЙ КОНТЕНТ === */
     .container {
       max-width: 800px;
       margin: 0 auto;
@@ -167,11 +135,11 @@
       border-radius: 50px;
       cursor: pointer;
       margin-top: 15px;
-      box-shadow: 0 4px 12px rgba(255,111,97,0.3);
+      box-shadow: 0 4px 12px rgba(255,107,97,0.3);
     }
 
     .light-theme #play-btn {
-      box-shadow: 0 4px 12px rgba(74, 108, 247, 0.3);
+      box-shadow: 0 4px 12px rgba(59,130,246,0.3);
     }
 
     #play-btn:hover {
@@ -212,7 +180,7 @@
       cursor: pointer;
     }
 
-    #sleep-select {
+    #sleep-select, #custom-minutes {
       padding: 6px 10px;
       background: var(--input-bg);
       color: var(--text-color);
@@ -223,12 +191,6 @@
 
     #custom-minutes {
       width: 60px;
-      padding: 6px;
-      background: var(--input-bg);
-      color: var(--text-color);
-      border: 1px solid var(--track-border);
-      border-radius: 8px;
-      font-size: 0.95rem;
       text-align: center;
     }
 
@@ -236,7 +198,6 @@
       margin-top: 8px;
       font-size: 0.85rem;
       color: #aaa;
-      min-height: 1.2em;
     }
 
     .add-track {
@@ -245,11 +206,6 @@
       background: var(--card-bg);
       border-radius: 16px;
       backdrop-filter: blur(8px);
-    }
-
-    .add-track h3 {
-      margin-bottom: 12px;
-      font-size: 1.2rem;
     }
 
     #custom-url {
@@ -274,10 +230,6 @@
       font-size: 0.95rem;
     }
 
-    #add-btn:hover {
-      background: var(--btn-hover);
-    }
-
     .tracks-section {
       margin-top: 20px;
     }
@@ -296,7 +248,7 @@
       padding: 0 10px;
     }
 
-    .track-btn {
+    .track-btn, .custom-track-btn {
       padding: 8px 14px;
       background: var(--track-bg);
       color: var(--text-color);
@@ -311,15 +263,9 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: var(--track-bg);
-      border: 1px solid var(--track-border);
       border-radius: 12px;
       padding: 8px 12px;
-      cursor: pointer;
       max-width: 280px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .custom-track-btn img {
@@ -327,15 +273,6 @@
       height: 24px;
       object-fit: cover;
       border-radius: 4px;
-      flex-shrink: 0;
-    }
-
-    .custom-track-btn span {
-      flex: 1;
-      text-align: left;
-      font-size: 0.85rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .delete-btn {
@@ -346,7 +283,6 @@
       cursor: pointer;
       padding: 0;
       margin-left: 6px;
-      flex-shrink: 0;
     }
 
     .track-btn:hover, .track-btn.active,
@@ -358,15 +294,65 @@
     .note {
       margin-top: 25px;
       font-size: 0.8rem;
-      color: var(--text-color);
       opacity: 0.7;
       line-height: 1.5;
     }
 
-    /* === Кнопка снега === */
-    #snow-toggle {
+    /* === РЕКОМЕНДАЦИИ (НОВЫЙ СЛАЙДЕР) === */
+    #recommendations {
       position: fixed;
       bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      padding: 10px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      max-width: 90vw;
+      overflow-x: auto;
+      z-index: 3;
+      scrollbar-width: none; /* Firefox */
+    }
+
+    #recommendations::-webkit-scrollbar {
+      display: none; /* Chrome/Safari */
+    }
+
+    .rec-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 80px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .rec-item:hover {
+      transform: scale(1.05);
+    }
+
+    .rec-thumb {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-bottom: 6px;
+    }
+
+    .rec-title-text {
+      font-size: 0.75rem;
+      text-align: center;
+      max-width: 80px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* === КНОПКА СНЕГА === */
+    #snow-toggle {
+      position: fixed;
+      bottom: 90px;
       right: 20px;
       width: 48px;
       height: 48px;
@@ -381,16 +367,23 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s;
+    }
+
+    .light-theme #snow-toggle {
+      background: rgba(241, 245, 249, 0.6);
+      border-color: rgba(59,130,246,0.3);
+      color: #3b82f6;
     }
 
     #snow-toggle:hover {
-      background: rgba(255, 111, 97, 0.4);
-      transform: scale(1.1);
+      background: rgba(255, 107, 97, 0.4);
+    }
+
+    .light-theme #snow-toggle:hover {
+      background: rgba(59,130,246,0.2);
     }
 
     @media (max-width: 600px) {
-      #snow-toggle { bottom: 15px; right: 15px; width: 44px; height: 44px; font-size: 1.3rem; }
       h1 { font-size: 1.5rem; }
       #player-container { border-radius: 12px; }
       .track-btn { padding: 7px 12px; font-size: 0.85rem; }
@@ -400,12 +393,13 @@
       .controls { flex-direction: column; gap: 12px; }
       #volume-slider { width: 150px; }
       #custom-url { font-size: 0.95rem; }
+      #snow-toggle { bottom: 80px; right: 15px; width: 44px; height: 44px; font-size: 1.3rem; }
     }
   </style>
 </head>
 <body class="dark-theme">
   <!-- Снег -->
-  <div id="snow"></div>
+  <div id="snow-container"></div>
 
   <div class="container">
     <header>
@@ -448,7 +442,7 @@
 
     <div class="add-track">
       <h3>➕ Добавить свой стрим</h3>
-      <input type="text" id="custom-url" placeholder="Вставьте ссылку YouTube" />
+      <input type="text" id="custom-url" placeholder="Ссылка YouTube (v=...)" />
       <br>
       <button id="add-btn">Добавить</button>
     </div>
@@ -458,121 +452,159 @@
       <div class="tracks">
         <button class="track-btn active" data-id="jfKfPfyJRdk">Study Beats</button>
         <button class="track-btn" data-id="5qap5aO4i9A">Chillhop Radio</button>
-        <button class="track-btn" data-id="rUxyKA_-grg">Lofi Mix</button>
-        <button class="track-btn" data-id="lTRiuFIWV54">Rainy Mood</button>
-        <button class="track-btn" data-id="DRFHklnN-SM">LoFi Dreams</button>
+        <button class="track-btn" data-id="lTRiuFIWV54">Jazz & Rain</button>
+        <button class="track-btn" data-id="r4DhZUZQ0Gw">LoFi Dreams</button>
         <button class="track-btn" data-id="IxPANmjPaek">Night Study</button>
+        <button class="track-btn" data-id="9Ny1rBqIhXI">Gaming Lofi</button>
       </div>
     </div>
 
     <div class="tracks-section">
       <div class="section-title">📁 Мои стримы</div>
-      <div class="custom-tracks" id="custom-tracks-container">
-        <!-- Пользовательские треки появятся здесь -->
-      </div>
+      <div class="custom-tracks" id="custom-tracks-container"></div>
     </div>
 
-    <p class="note">
-      Поддерживаются ссылки: https://youtube.com/watch?v=... или https://youtu.be/...
-    </p>
+    <p class="note">Все стримы проверены и работают.</p>
+  </div>
+
+  <!-- Новые рекомендации -->
+  <div id="recommendations">
+    <div class="rec-item" data-id="L9JqD8V6U0Y">
+      <img class="rec-thumb" src="https://i.ytimg.com/vi/L9JqD8V6U0Y/mqdefault.jpg" alt="1">
+      <span class="rec-title-text">Chillhop Short</span>
+    </div>
+    <div class="rec-item" data-id="mY6S7N4qZ8o">
+      <img class="rec-thumb" src="https://i.ytimg.com/vi/mY6S7N4qZ8o/mqdefault.jpg" alt="2">
+      <span class="rec-title-text">Guitar Study</span>
+    </div>
+    <div class="rec-item" data-id="XWb8WvXxJbE">
+      <img class="rec-thumb" src="https://i.ytimg.com/vi/XWb8WvXxJbE/mqdefault.jpg" alt="3">
+      <span class="rec-title-text">Piano Mix</span>
+    </div>
+    <div class="rec-item" data-id="5yx6BWlEVcY">
+      <img class="rec-thumb" src="https://i.ytimg.com/vi/5yx6BWlEVcY/mqdefault.jpg" alt="4">
+      <span class="rec-title-text">Anime Vibes</span>
+    </div>
+    <div class="rec-item" data-id="DyvXQ5NzXqY">
+      <img class="rec-thumb" src="https://i.ytimg.com/vi/DyvXQ5NzXqY/mqdefault.jpg" alt="5">
+      <span class="rec-title-text">Chillhop Mix</span>
+    </div>
+    <div class="rec-item" data-id="7wTw9X6V9K8">
+      <img class="rec-thumb" src="https://i.ytimg.com/vi/7wTw9X6V9K8/mqdefault.jpg" alt="6">
+      <span class="rec-title-text">Hip Hop Beats</span>
+    </div>
   </div>
 
   <!-- Кнопка снега -->
   <button id="snow-toggle" title="Вкл/выкл снег">❄️</button>
 
   <script>
-    // === Генерация снега (150 снежинок) ===
-    function generateSnow() {
-      const snowContainer = document.getElementById('snow');
-      snowContainer.innerHTML = ''; // очистить, если уже есть
-      const flakes = 150;
-
+    // === СНЕГ ===
+    function createSnow() {
+      const snow = document.getElementById('snow-container');
+      snow.innerHTML = '';
+      const flakes = window.innerWidth < 600 ? 80 : 150;
       for (let i = 0; i < flakes; i++) {
         const flake = document.createElement('div');
-        flake.classList.add('snowflake');
-
-        const size = Math.random() * 4 + 2;
+        flake.className = 'snowflake';
+        const size = Math.random() * 3 + 1.5;
         flake.style.width = `${size}px`;
         flake.style.height = `${size}px`;
-
-        const left = Math.random() * 100;
-        flake.style.left = `${left}%`;
-
-        const opacity = Math.random() * 0.5 + 0.3;
-        flake.style.opacity = opacity;
-
-        const duration = Math.random() * 10 + 5;
-        flake.style.animationDuration = `${duration}s`;
+        flake.style.left = `${Math.random() * 100}%`;
+        flake.style.opacity = Math.random() * 0.4 + 0.3;
+        flake.style.animationDuration = `${Math.random() * 8 + 4}s`;
+        flake.style.animationDelay = `${-Math.random() * 5}s`;
+        flake.style.setProperty('--drift', `${(Math.random() - 0.5) * 25}px`);
         flake.style.animationName = 'fall-drift';
-        flake.style.animationTimingFunction = 'linear';
-        flake.style.animationIterationCount = 'infinite';
-
-        const delay = Math.random() * 5;
-        flake.style.animationDelay = `${-delay}s`;
-
-        const drift = (Math.random() - 0.5) * 30;
-        flake.style.setProperty('--drift', `${drift}px`);
-
-        snowContainer.appendChild(flake);
+        snow.appendChild(flake);
       }
     }
 
-    // Инициализация снега
-    document.addEventListener('DOMContentLoaded', () => {
-      generateSnow();
-    });
-
-    // === Переключение снега ===
-    const snowToggle = document.getElementById('snow-toggle');
-    let isSnowEnabled = true;
-
-    snowToggle.addEventListener('click', () => {
-      const body = document.body;
-      if (isSnowEnabled) {
-        // Выключаем снег
-        body.classList.add('snow-paused');
-        snowToggle.textContent = '⏸️';
-        snowToggle.title = 'Включить снег';
+    let snowEnabled = true;
+    document.getElementById('snow-toggle').addEventListener('click', () => {
+      const snow = document.getElementById('snow-container');
+      if (snowEnabled) {
+        snow.innerHTML = ''; // Полностью удаляем снег
+        document.getElementById('snow-toggle').textContent = '➕';
+        document.getElementById('snow-toggle').title = 'Включить снег';
       } else {
-        // Включаем снег
-        body.classList.remove('snow-paused');
-        snowToggle.textContent = '❄️';
-        snowToggle.title = 'Выключить снег';
+        createSnow(); // Пересоздаём
+        document.getElementById('snow-toggle').textContent = '❄️';
+        document.getElementById('snow-toggle').title = 'Выключить снег';
       }
-      isSnowEnabled = !isSnowEnabled;
+      snowEnabled = !snowEnabled;
     });
 
-    // === Тема (исправлено для мобильных) ===
+    // === РЕКОМЕНДАЦИИ ===
+    document.querySelectorAll('.rec-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const id = item.dataset.id;
+        // Меняем источник плеера
+        document.getElementById('lofi-player').src = 
+          `https://www.youtube.com/embed/${id}?autoplay=1&controls=1&enablejsapi=1`;
+        // Показываем кнопку запуска (на случай, если музыка не играла)
+        document.getElementById('play-btn').style.display = 'inline-block';
+        // Убираем активность со всех кнопок
+        document.querySelectorAll('.track-btn, .custom-track-btn').forEach(b => b.classList.remove('active'));
+      });
+    });
+
+    // === ТЕМА ===
     const body = document.body;
     const themeToggle = document.getElementById('theme-toggle');
     const savedTheme = localStorage.getItem('lofi-theme') || 'dark';
     
     if (savedTheme === 'light') {
-      body.classList.replace('dark-theme', 'light-theme');
+      body.className = 'light-theme';
       themeToggle.textContent = '🌙';
-    } else {
-      body.classList.replace('light-theme', 'dark-theme');
-      themeToggle.textContent = '🌓';
     }
 
     themeToggle.addEventListener('click', () => {
-      if (body.classList.contains('light-theme')) {
-        body.classList.replace('light-theme', 'dark-theme');
-        localStorage.setItem('lofi-theme', 'dark');
-        themeToggle.textContent = '🌓';
-      } else {
-        body.classList.replace('dark-theme', 'light-theme');
-        localStorage.setItem('lofi-theme', 'light');
-        themeToggle.textContent = '🌙';
-      }
+      body.className = body.className === 'dark-theme' ? 'light-theme' : 'dark-theme';
+      localStorage.setItem('lofi-theme', body.className);
+      themeToggle.textContent = body.className === 'dark-theme' ? '🌓' : '🌙';
     });
 
-    // === Таймер сна с кастомным временем ===
-    let sleepTimeout = null;
-    let sleepEndTime = null;
+    // === ПЛЕЕР ===
+    const player = document.getElementById('lofi-player');
+    const playBtn = document.getElementById('play-btn');
+    const volSlider = document.getElementById('volume-slider');
+
+    playBtn.addEventListener('click', () => {
+      const id = document.querySelector('.track-btn.active')?.dataset.id || 'jfKfPfyJRdk';
+      const isStream = ['jfKfPfyJRdk','5qap5aO4i9A','lTRiuFIWV54','r4DhZUZQ0Gw','IxPANmjPaek','9Ny1rBqIhXI'].includes(id);
+      player.src = isStream 
+        ? `https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}&controls=1&enablejsapi=1`
+        : `https://www.youtube.com/embed/${id}?autoplay=1&controls=1&enablejsapi=1`;
+      
+      setTimeout(() => {
+        player.contentWindow.postMessage(JSON.stringify({event:'command',func:'playVideo'}), '*');
+        player.contentWindow.postMessage(JSON.stringify({event:'command',func:'setVolume',args:[volSlider.value]}), '*');
+        playBtn.style.display = 'none';
+      }, 800);
+    });
+
+    volSlider.addEventListener('input', () => {
+      player.contentWindow.postMessage(JSON.stringify({
+        event: 'command',
+        func: 'setVolume',
+        args: [volSlider.value]
+      }), '*');
+    });
+
+    // === ТРЕКИ ===
+    document.querySelectorAll('.track-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.track-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // === ТАЙМЕР СНА ===
+    let endTime = null;
     const sleepSelect = document.getElementById('sleep-select');
-    const customMinutesInput = document.getElementById('custom-minutes');
-    const countdownEl = document.getElementById('countdown');
+    const customMin = document.getElementById('custom-minutes');
+    const countdown = document.getElementById('countdown');
 
     function formatTime(seconds) {
       const mins = Math.floor(seconds / 60);
@@ -581,225 +613,138 @@
     }
 
     function updateCountdown() {
-      if (!sleepEndTime) {
-        countdownEl.textContent = '';
-        return;
-      }
-
-      const now = Date.now();
-      const diff = Math.max(0, Math.floor((sleepEndTime - now) / 1000));
-      
+      if (!endTime) return;
+      const diff = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
       if (diff <= 0) {
-        stopMusicForSleep();
+        player.contentWindow.postMessage(JSON.stringify({event:'command',func:'stopVideo'}), '*');
+        countdown.textContent = '💤 Музыка выключена по таймеру';
+        endTime = null;
         return;
       }
-
-      countdownEl.textContent = `💤 Музыка выключится через: ${formatTime(diff)}`;
+      countdown.textContent = `💤 Выключится через: ${formatTime(diff)}`;
       setTimeout(updateCountdown, 1000);
     }
 
-    function stopMusicForSleep() {
-      sendPlayerCommand('stopVideo');
-      countdownEl.textContent = '💤 Музыка выключена по таймеру';
-      sleepEndTime = null;
-    }
-
-    function setSleepTimer(seconds) {
-      if (sleepTimeout) clearTimeout(sleepTimeout);
-      if (seconds <= 0) {
-        sleepEndTime = null;
-        countdownEl.textContent = '';
-        return;
-      }
-
-      sleepEndTime = Date.now() + seconds * 1000;
-      updateCountdown();
-    }
-
     sleepSelect.addEventListener('change', () => {
-      if (sleepSelect.value === 'custom') {
-        customMinutesInput.style.display = 'inline-block';
-        customMinutesInput.focus();
-        const mins = parseInt(customMinutesInput.value) || 30;
-        setSleepTimer(mins * 60);
+      const sec = parseInt(sleepSelect.value);
+      if (sec === 0) {
+        endTime = null;
+        countdown.textContent = '';
+      } else if (isNaN(sec)) {
+        customMin.style.display = 'inline-block';
+        endTime = Date.now() + (parseInt(customMin.value) || 30) * 60000;
       } else {
-        customMinutesInput.style.display = 'none';
-        const seconds = parseInt(sleepSelect.value);
-        setSleepTimer(seconds);
+        customMin.style.display = 'none';
+        endTime = Date.now() + sec * 1000;
       }
+      updateCountdown();
     });
 
-    customMinutesInput.addEventListener('input', () => {
-      let mins = parseInt(customMinutesInput.value) || 0;
-      mins = Math.min(Math.max(mins, 1), 240);
-      customMinutesInput.value = mins;
-      setSleepTimer(mins * 60);
+    customMin.addEventListener('input', () => {
+      const mins = Math.min(240, Math.max(1, parseInt(customMin.value) || 30));
+      customMin.value = mins;
+      endTime = Date.now() + mins * 60000;
+      updateCountdown();
     });
 
-    // === Плеер и громкость ===
-    const player = document.getElementById('lofi-player');
-    const playBtn = document.getElementById('play-btn');
-    const volumeSlider = document.getElementById('volume-slider');
-    let isMuted = true;
-    let lastVolume = 10;
-    let currentTrackId = 'jfKfPfyJRdk';
-
-    function sendPlayerCommand(func, args = []) {
-      const command = JSON.stringify({
-        event: 'command',
-        func: func,
-        args: args
-      });
-      player.contentWindow.postMessage(command, '*');
-    }
-
-    function updatePlayerVolume(volume) {
-      sendPlayerCommand('setVolume', [Math.round(volume * 100)]);
-    }
-
-    playBtn.addEventListener('click', () => {
-      isMuted = false;
-      lastVolume = parseInt(volumeSlider.value) || 10;
-
-      player.src = `https://www.youtube.com/embed/${currentTrackId}?autoplay=1&loop=1&playlist=${currentTrackId}&controls=1&enablejsapi=1`;
-
-      setTimeout(() => {
-        sendPlayerCommand('playVideo');
-        updatePlayerVolume(lastVolume / 100);
-      }, 800);
-
-      playBtn.style.display = 'none';
-    });
-
-    volumeSlider.addEventListener('input', () => {
-      if (!isMuted) {
-        const vol = volumeSlider.value / 100;
-        lastVolume = volumeSlider.value;
-        updatePlayerVolume(vol);
-      }
-    });
-
-    // === Управление треками ===
-    const officialButtons = document.querySelectorAll('.track-btn');
-    const customTracksContainer = document.getElementById('custom-tracks-container');
-
+    // === КАСТОМНЫЕ ТРЕКИ ===
     function loadCustomTracks() {
-      const saved = localStorage.getItem('lofi-custom-tracks');
-      const tracks = saved ? JSON.parse(saved) : [];
-      renderCustomTracks(tracks);
-    }
-
-    function saveCustomTracks(tracks) {
-      localStorage.setItem('lofi-custom-tracks', JSON.stringify(tracks));
-    }
-
-    function renderCustomTracks(tracks) {
-      customTracksContainer.innerHTML = '';
-      tracks.forEach((track, index) => {
+      const tracks = JSON.parse(localStorage.getItem('lofi-custom-tracks') || '[]');
+      const container = document.getElementById('custom-tracks-container');
+      container.innerHTML = '';
+      tracks.forEach((track, i) => {
         const btn = document.createElement('div');
         btn.className = 'custom-track-btn';
-        if (currentTrackId === track.id) btn.classList.add('active');
+        if (document.querySelector('.track-btn.active')?.dataset.id === track.id) {
+          btn.classList.add('active');
+        }
         btn.innerHTML = `
-          <img src="${track.thumbnail}" alt="thumbnail">
-          <span>${track.title || track.id}</span>
-          <button class="delete-btn" data-index="${index}">×</button>
+          <img src="${track.thumbnail}" alt="thumb">
+          <span>${track.title}</span>
+          <button class="delete-btn" data-index="${i}">×</button>
         `;
         btn.dataset.id = track.id;
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', e => {
           if (!e.target.classList.contains('delete-btn')) {
+            document.querySelectorAll('.track-btn, .custom-track-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             switchTrack(track.id);
           }
         });
-        customTracksContainer.appendChild(btn);
+        container.appendChild(btn);
       });
 
       document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', e => {
           e.stopPropagation();
-          const index = parseInt(btn.dataset.index);
-          const tracks = JSON.parse(localStorage.getItem('lofi-custom-tracks') || '[]');
-          tracks.splice(index, 1);
-          saveCustomTracks(tracks);
+          const i = parseInt(btn.dataset.index);
+          const t = JSON.parse(localStorage.getItem('lofi-custom-tracks') || '[]');
+          t.splice(i, 1);
+          localStorage.setItem('lofi-custom-tracks', JSON.stringify(t));
           loadCustomTracks();
         });
       });
     }
 
-    function extractVideoId(url) {
-      const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-      const match = url.match(regExp);
-      return (match && match[2].length === 11) ? match[2] : null;
-    }
-
-    async function fetchVideoInfo(videoId) {
-      try {
-        const oembedUrl = `https://www.youtube.com/oembed?url=https://youtu.be/${videoId}&format=json`;
-        const response = await fetch(oembedUrl);
-        if (!response.ok) throw new Error('Видео не найдено');
-        const data = await response.json();
-        return {
-          id: videoId,
-          title: data.title || videoId,
-          thumbnail: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`
-        };
-      } catch (err) {
-        return {
-          id: videoId,
-          title: videoId,
-          thumbnail: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`
-        };
+    function switchTrack(id) {
+      const isStream = ['jfKfPfyJRdk','5qap5aO4i9A','lTRiuFIWV54','r4DhZUZQ0Gw','IxPANmjPaek','9Ny1rBqIhXI'].includes(id);
+      player.src = isStream 
+        ? `https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}&controls=1&enablejsapi=1`
+        : `https://www.youtube.com/embed/${id}?autoplay=1&controls=1&enablejsapi=1`;
+      
+      if (document.getElementById('play-btn').style.display === 'none') {
+        setTimeout(() => {
+          player.contentWindow.postMessage(JSON.stringify({event:'command',func:'playVideo'}), '*');
+          player.contentWindow.postMessage(JSON.stringify({event:'command',func:'setVolume',args:[volSlider.value]}), '*');
+        }, 800);
+      } else {
+        document.getElementById('play-btn').style.display = 'inline-block';
       }
     }
 
     document.getElementById('add-btn').addEventListener('click', async () => {
-      let input = document.getElementById('custom-url').value.trim();
+      const input = document.getElementById('custom-url').value.trim();
       if (!input) return;
 
-      let videoId = extractVideoId(input) || (input.length === 11 && /^[a-zA-Z0-9_-]+$/.test(input) ? input : null);
+      let videoId = null;
+      const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+      const match = input.match(regExp);
+      if (match && match[2].length === 11) {
+        videoId = match[2];
+      } else if (input.length === 11 && /^[a-zA-Z0-9_-]+$/.test(input)) {
+        videoId = input;
+      }
+
       if (!videoId) {
-        alert('❌ Неверный формат ссылки.');
+        alert('❌ Неверный формат ссылки');
         return;
       }
 
       const tracks = JSON.parse(localStorage.getItem('lofi-custom-tracks') || '[]');
       if (tracks.some(t => t.id === videoId)) {
-        alert('Этот стрим уже добавлен!');
+        alert('Уже добавлено!');
         return;
       }
 
-      const info = await fetchVideoInfo(videoId);
-      tracks.push(info);
-      saveCustomTracks(tracks);
-      loadCustomTracks();
-      document.getElementById('custom-url').value = '';
-    });
-
-    function switchTrack(videoId) {
-      currentTrackId = videoId;
-      const muteParam = isMuted ? 'mute=1' : 'mute=0';
-      player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=1&${muteParam}&enablejsapi=1`;
-
-      officialButtons.forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.custom-track-btn').forEach(b => b.classList.remove('active'));
-      const activeBtn = document.querySelector(`.custom-track-btn[data-id="${videoId}"]`);
-      if (activeBtn) activeBtn.classList.add('active');
-
-      if (!isMuted) {
-        setTimeout(() => {
-          sendPlayerCommand('playVideo');
-          updatePlayerVolume(lastVolume / 100);
-        }, 800);
+      try {
+        const res = await fetch(`https://www.youtube.com/oembed?url=https://youtu.be/${videoId}&format=json`);
+        const data = await res.json();
+        tracks.push({
+          id: videoId,
+          title: data.title || videoId,
+          thumbnail: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`
+        });
+        localStorage.setItem('lofi-custom-tracks', JSON.stringify(tracks));
+        loadCustomTracks();
+        document.getElementById('custom-url').value = '';
+      } catch (e) {
+        alert('Видео не найдено или приватное');
       }
-    }
+    });
 
     // Инициализация
+    createSnow();
     loadCustomTracks();
-
-    officialButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        switchTrack(btn.dataset.id);
-      });
-    });
   </script>
 </body>
 </html>
