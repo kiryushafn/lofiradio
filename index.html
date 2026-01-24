@@ -298,33 +298,31 @@
       line-height: 1.5;
     }
 
-    /* === РЕКОМЕНДАЦИИ (НОВЫЙ СЛАЙДЕР) === */
-    #recommendations {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 12px;
-      padding: 10px;
-      background: var(--card-bg);
-      border-radius: 16px;
-      backdrop-filter: blur(8px);
-      max-width: 90vw;
-      overflow-x: auto;
-      z-index: 3;
-      scrollbar-width: none; /* Firefox */
+    /* === РЕКОМЕНДАЦИИ (ПОД ВСЕМ КОНТЕНТОМ) === */
+    #recommendations-container {
+      margin-top: 40px;
+      padding: 20px;
     }
 
-    #recommendations::-webkit-scrollbar {
-      display: none; /* Chrome/Safari */
+    #recommendations-title {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      opacity: 0.8;
+    }
+
+    #recommendations {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 0 10px;
     }
 
     .rec-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-width: 80px;
+      width: 100px;
       cursor: pointer;
       transition: transform 0.2s;
     }
@@ -334,17 +332,18 @@
     }
 
     .rec-thumb {
-      width: 60px;
-      height: 60px;
-      border-radius: 8px;
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
       object-fit: cover;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
     .rec-title-text {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       text-align: center;
-      max-width: 80px;
+      max-width: 90px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -352,7 +351,7 @@
     /* === КНОПКА СНЕГА === */
     #snow-toggle {
       position: fixed;
-      bottom: 90px;
+      bottom: 20px;
       right: 20px;
       width: 48px;
       height: 48px;
@@ -393,7 +392,9 @@
       .controls { flex-direction: column; gap: 12px; }
       #volume-slider { width: 150px; }
       #custom-url { font-size: 0.95rem; }
-      #snow-toggle { bottom: 80px; right: 15px; width: 44px; height: 44px; font-size: 1.3rem; }
+      #snow-toggle { bottom: 15px; right: 15px; width: 44px; height: 44px; font-size: 1.3rem; }
+      .rec-thumb { width: 70px; height: 70px; }
+      .rec-item { width: 90px; }
     }
   </style>
 </head>
@@ -464,34 +465,37 @@
       <div class="custom-tracks" id="custom-tracks-container"></div>
     </div>
 
-    <p class="note">Все стримы проверены и работают.</p>
+    <p class="note">Все стримы проверены и работают (12.12.2025).</p>
   </div>
 
-  <!-- Новые рекомендации -->
-  <div id="recommendations">
-    <div class="rec-item" data-id="L9JqD8V6U0Y">
-      <img class="rec-thumb" src="https://i.ytimg.com/vi/L9JqD8V6U0Y/mqdefault.jpg" alt="1">
-      <span class="rec-title-text">Chillhop Short</span>
-    </div>
-    <div class="rec-item" data-id="mY6S7N4qZ8o">
-      <img class="rec-thumb" src="https://i.ytimg.com/vi/mY6S7N4qZ8o/mqdefault.jpg" alt="2">
-      <span class="rec-title-text">Guitar Study</span>
-    </div>
-    <div class="rec-item" data-id="XWb8WvXxJbE">
-      <img class="rec-thumb" src="https://i.ytimg.com/vi/XWb8WvXxJbE/mqdefault.jpg" alt="3">
-      <span class="rec-title-text">Piano Mix</span>
-    </div>
-    <div class="rec-item" data-id="5yx6BWlEVcY">
-      <img class="rec-thumb" src="https://i.ytimg.com/vi/5yx6BWlEVcY/mqdefault.jpg" alt="4">
-      <span class="rec-title-text">Anime Vibes</span>
-    </div>
-    <div class="rec-item" data-id="DyvXQ5NzXqY">
-      <img class="rec-thumb" src="https://i.ytimg.com/vi/DyvXQ5NzXqY/mqdefault.jpg" alt="5">
-      <span class="rec-title-text">Chillhop Mix</span>
-    </div>
-    <div class="rec-item" data-id="7wTw9X6V9K8">
-      <img class="rec-thumb" src="https://i.ytimg.com/vi/7wTw9X6V9K8/mqdefault.jpg" alt="6">
-      <span class="rec-title-text">Hip Hop Beats</span>
+  <!-- РЕКОМЕНДАЦИИ ПОД ВСЕМ -->
+  <div id="recommendations-container">
+    <div id="recommendations-title">📌 Вам может понравиться</div>
+    <div id="recommendations">
+      <div class="rec-item" data-id="L9JqD8V6U0Y">
+        <img class="rec-thumb" src="https://i.ytimg.com/vi/L9JqD8V6U0Y/mqdefault.jpg" alt="1">
+        <span class="rec-title-text">Chillhop Short</span>
+      </div>
+      <div class="rec-item" data-id="mY6S7N4qZ8o">
+        <img class="rec-thumb" src="https://i.ytimg.com/vi/mY6S7N4qZ8o/mqdefault.jpg" alt="2">
+        <span class="rec-title-text">Guitar Study</span>
+      </div>
+      <div class="rec-item" data-id="XWb8WvXxJbE">
+        <img class="rec-thumb" src="https://i.ytimg.com/vi/XWb8WvXxJbE/mqdefault.jpg" alt="3">
+        <span class="rec-title-text">Piano Mix</span>
+      </div>
+      <div class="rec-item" data-id="5yx6BWlEVcY">
+        <img class="rec-thumb" src="https://i.ytimg.com/vi/5yx6BWlEVcY/mqdefault.jpg" alt="4">
+        <span class="rec-title-text">Anime Vibes</span>
+      </div>
+      <div class="rec-item" data-id="DyvXQ5NzXqY">
+        <img class="rec-thumb" src="https://i.ytimg.com/vi/DyvXQ5NzXqY/mqdefault.jpg" alt="5">
+        <span class="rec-title-text">Chillhop Mix</span>
+      </div>
+      <div class="rec-item" data-id="7wTw9X6V9K8">
+        <img class="rec-thumb" src="https://i.ytimg.com/vi/7wTw9X6V9K8/mqdefault.jpg" alt="6">
+        <span class="rec-title-text">Hip Hop Beats</span>
+      </div>
     </div>
   </div>
 
@@ -524,11 +528,11 @@
     document.getElementById('snow-toggle').addEventListener('click', () => {
       const snow = document.getElementById('snow-container');
       if (snowEnabled) {
-        snow.innerHTML = ''; // Полностью удаляем снег
+        snow.innerHTML = '';
         document.getElementById('snow-toggle').textContent = '➕';
         document.getElementById('snow-toggle').title = 'Включить снег';
       } else {
-        createSnow(); // Пересоздаём
+        createSnow();
         document.getElementById('snow-toggle').textContent = '❄️';
         document.getElementById('snow-toggle').title = 'Выключить снег';
       }
@@ -539,12 +543,9 @@
     document.querySelectorAll('.rec-item').forEach(item => {
       item.addEventListener('click', () => {
         const id = item.dataset.id;
-        // Меняем источник плеера
         document.getElementById('lofi-player').src = 
           `https://www.youtube.com/embed/${id}?autoplay=1&controls=1&enablejsapi=1`;
-        // Показываем кнопку запуска (на случай, если музыка не играла)
         document.getElementById('play-btn').style.display = 'inline-block';
-        // Убираем активность со всех кнопок
         document.querySelectorAll('.track-btn, .custom-track-btn').forEach(b => b.classList.remove('active'));
       });
     });
