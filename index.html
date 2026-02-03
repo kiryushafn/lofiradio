@@ -298,7 +298,7 @@
       line-height: 1.5;
     }
 
-    /* === РЕКОМЕНДАЦИИ (ПОД ВСЕМ КОНТЕНТОМ) === */
+    /* === РЕКОМЕНДАЦИИ === */
     #recommendations-container {
       margin-top: 40px;
       padding: 20px;
@@ -468,41 +468,45 @@
     <p class="note">Все стримы проверены и работают (12.12.2025).</p>
   </div>
 
-  <!-- РЕКОМЕНДАЦИИ ПОД ВСЕМ -->
+  <!-- РЕКОМЕНДАЦИИ -->
   <div id="recommendations-container">
     <div id="recommendations-title">📌 Вам может понравиться</div>
     <div id="recommendations">
       <div class="rec-item" data-id="L9JqD8V6U0Y">
-        <img class="rec-thumb" src="https://i.ytimg.com/vi/L9JqD8V6U0Y/mqdefault.jpg" alt="1">
+        <img class="rec-thumb" src="https://img.youtube.com/vi/L9JqD8V6U0Y/mqdefault.jpg" alt="1">
         <span class="rec-title-text">Chillhop Short</span>
       </div>
       <div class="rec-item" data-id="mY6S7N4qZ8o">
-        <img class="rec-thumb" src="https://i.ytimg.com/vi/mY6S7N4qZ8o/mqdefault.jpg" alt="2">
+        <img class="rec-thumb" src="https://img.youtube.com/vi/mY6S7N4qZ8o/mqdefault.jpg" alt="2">
         <span class="rec-title-text">Guitar Study</span>
       </div>
       <div class="rec-item" data-id="XWb8WvXxJbE">
-        <img class="rec-thumb" src="https://i.ytimg.com/vi/XWb8WvXxJbE/mqdefault.jpg" alt="3">
+        <img class="rec-thumb" src="https://img.youtube.com/vi/XWb8WvXxJbE/mqdefault.jpg" alt="3">
         <span class="rec-title-text">Piano Mix</span>
       </div>
       <div class="rec-item" data-id="5yx6BWlEVcY">
-        <img class="rec-thumb" src="https://i.ytimg.com/vi/5yx6BWlEVcY/mqdefault.jpg" alt="4">
+        <img class="rec-thumb" src="https://img.youtube.com/vi/5yx6BWlEVcY/mqdefault.jpg" alt="4">
         <span class="rec-title-text">Anime Vibes</span>
       </div>
       <div class="rec-item" data-id="DyvXQ5NzXqY">
-        <img class="rec-thumb" src="https://i.ytimg.com/vi/DyvXQ5NzXqY/mqdefault.jpg" alt="5">
+        <img class="rec-thumb" src="https://img.youtube.com/vi/DyvXQ5NzXqY/mqdefault.jpg" alt="5">
         <span class="rec-title-text">Chillhop Mix</span>
       </div>
       <div class="rec-item" data-id="7wTw9X6V9K8">
-        <img class="rec-thumb" src="https://i.ytimg.com/vi/7wTw9X6V9K8/mqdefault.jpg" alt="6">
+        <img class="rec-thumb" src="https://img.youtube.com/vi/7wTw9X6V9K8/mqdefault.jpg" alt="6">
         <span class="rec-title-text">Hip Hop Beats</span>
       </div>
     </div>
   </div>
 
-  <!-- Кнопка снега -->
   <button id="snow-toggle" title="Вкл/выкл снег">❄️</button>
 
   <script>
+    // === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ===
+    let currentTrackId = 'jfKfPfyJRdk';
+    let isMuted = true;
+    let lastVolume = 10;
+
     // === СНЕГ ===
     function createSnow() {
       const snow = document.getElementById('snow-container');
@@ -539,14 +543,57 @@
       snowEnabled = !snowEnabled;
     });
 
+    // === ПЕРЕКЛЮЧЕНИЕ ТРЕКА ===
+    function switchTrack(videoId) {
+      currentTrackId = videoId;
+      
+      const isStream = [
+        'jfKfPfyJRdk',
+        '5qap5aO4i9A',
+        'lTRiuFIWV54',
+        'r4DhZUZQ0Gw',
+        'IxPANmjPaek',
+        '9Ny1rBqIhXI'
+      ].includes(videoId);
+
+      const player = document.getElementById('lofi-player');
+      if (isStream) {
+        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=1&enablejsapi=1`;
+      } else {
+        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&enablejsapi=1`;
+      }
+
+      // Обновляем активные кнопки
+      document.querySelectorAll('.track-btn, .custom-track-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      const activeBtn = document.querySelector(`[data-id="${videoId}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      // Если музыка уже играет — сразу воспроизводим
+      if (!isMuted) {
+        setTimeout(() => {
+          player.contentWindow.postMessage(JSON.stringify({event:'command',func:'playVideo'}), '*');
+          player.contentWindow.postMessage(JSON.stringify({event:'command',func:'setVolume',args:[lastVolume]}), '*');
+        }, 800);
+      } else {
+        document.getElementById('play-btn').style.display = 'inline-block';
+      }
+    }
+
+    // === ОФИЦИАЛЬНЫЕ ТРЕКИ ===
+    document.querySelectorAll('.track-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        switchTrack(id);
+      });
+    });
+
     // === РЕКОМЕНДАЦИИ ===
     document.querySelectorAll('.rec-item').forEach(item => {
       item.addEventListener('click', () => {
         const id = item.dataset.id;
-        document.getElementById('lofi-player').src = 
-          `https://www.youtube.com/embed/${id}?autoplay=1&controls=1&enablejsapi=1`;
-        document.getElementById('play-btn').style.display = 'inline-block';
-        document.querySelectorAll('.track-btn, .custom-track-btn').forEach(b => b.classList.remove('active'));
+        switchTrack(id);
       });
     });
 
@@ -572,33 +619,35 @@
     const volSlider = document.getElementById('volume-slider');
 
     playBtn.addEventListener('click', () => {
-      const id = document.querySelector('.track-btn.active')?.dataset.id || 'jfKfPfyJRdk';
-      const isStream = ['jfKfPfyJRdk','5qap5aO4i9A','lTRiuFIWV54','r4DhZUZQ0Gw','IxPANmjPaek','9Ny1rBqIhXI'].includes(id);
-      player.src = isStream 
-        ? `https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}&controls=1&enablejsapi=1`
-        : `https://www.youtube.com/embed/${id}?autoplay=1&controls=1&enablejsapi=1`;
-      
+      isMuted = false;
+      lastVolume = parseInt(volSlider.value) || 10;
+
+      const isStream = [
+        'jfKfPfyJRdk','5qap5aO4i9A','lTRiuFIWV54','r4DhZUZQ0Gw','IxPANmjPaek','9Ny1rBqIhXI'
+      ].includes(currentTrackId);
+
+      if (isStream) {
+        player.src = `https://www.youtube.com/embed/${currentTrackId}?autoplay=1&loop=1&playlist=${currentTrackId}&controls=1&enablejsapi=1`;
+      } else {
+        player.src = `https://www.youtube.com/embed/${currentTrackId}?autoplay=1&controls=1&enablejsapi=1`;
+      }
+
       setTimeout(() => {
         player.contentWindow.postMessage(JSON.stringify({event:'command',func:'playVideo'}), '*');
-        player.contentWindow.postMessage(JSON.stringify({event:'command',func:'setVolume',args:[volSlider.value]}), '*');
+        player.contentWindow.postMessage(JSON.stringify({event:'command',func:'setVolume',args:[lastVolume]}), '*');
         playBtn.style.display = 'none';
       }, 800);
     });
 
     volSlider.addEventListener('input', () => {
-      player.contentWindow.postMessage(JSON.stringify({
-        event: 'command',
-        func: 'setVolume',
-        args: [volSlider.value]
-      }), '*');
-    });
-
-    // === ТРЕКИ ===
-    document.querySelectorAll('.track-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.track-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      });
+      lastVolume = volSlider.value;
+      if (!isMuted) {
+        player.contentWindow.postMessage(JSON.stringify({
+          event: 'command',
+          func: 'setVolume',
+          args: [lastVolume]
+        }), '*');
+      }
     });
 
     // === ТАЙМЕР СНА ===
@@ -656,19 +705,17 @@
       tracks.forEach((track, i) => {
         const btn = document.createElement('div');
         btn.className = 'custom-track-btn';
-        if (document.querySelector('.track-btn.active')?.dataset.id === track.id) {
+        if (track.id === currentTrackId) {
           btn.classList.add('active');
         }
         btn.innerHTML = `
-          <img src="${track.thumbnail}" alt="thumb">
+          <img src="https://img.youtube.com/vi/${track.id}/mqdefault.jpg" alt="thumb">
           <span>${track.title}</span>
           <button class="delete-btn" data-index="${i}">×</button>
         `;
         btn.dataset.id = track.id;
         btn.addEventListener('click', e => {
           if (!e.target.classList.contains('delete-btn')) {
-            document.querySelectorAll('.track-btn, .custom-track-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
             switchTrack(track.id);
           }
         });
@@ -685,22 +732,6 @@
           loadCustomTracks();
         });
       });
-    }
-
-    function switchTrack(id) {
-      const isStream = ['jfKfPfyJRdk','5qap5aO4i9A','lTRiuFIWV54','r4DhZUZQ0Gw','IxPANmjPaek','9Ny1rBqIhXI'].includes(id);
-      player.src = isStream 
-        ? `https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}&controls=1&enablejsapi=1`
-        : `https://www.youtube.com/embed/${id}?autoplay=1&controls=1&enablejsapi=1`;
-      
-      if (document.getElementById('play-btn').style.display === 'none') {
-        setTimeout(() => {
-          player.contentWindow.postMessage(JSON.stringify({event:'command',func:'playVideo'}), '*');
-          player.contentWindow.postMessage(JSON.stringify({event:'command',func:'setVolume',args:[volSlider.value]}), '*');
-        }, 800);
-      } else {
-        document.getElementById('play-btn').style.display = 'inline-block';
-      }
     }
 
     document.getElementById('add-btn').addEventListener('click', async () => {
@@ -733,7 +764,7 @@
         tracks.push({
           id: videoId,
           title: data.title || videoId,
-          thumbnail: `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`
+          thumbnail: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
         });
         localStorage.setItem('lofi-custom-tracks', JSON.stringify(tracks));
         loadCustomTracks();
