@@ -1,782 +1,388 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>∞ Lofi Radio</title>
-  <link rel="icon" href="image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎧</text></svg>">
-  <style>
-    :root {
-      --bg-gradient: linear-gradient(135deg, #0c0f1d, #121a2e, #0a1428);
-      --text-color: #f0f0f0;
-      --card-bg: rgba(20, 25, 45, 0.7);
-      --btn-bg: #ff6b61;
-      --btn-hover: #ff523d;
-      --track-bg: rgba(255,255,255,0.1);
-      --track-border: rgba(255,255,255,0.15);
-      --track-active: rgba(255,107,97,0.3);
-      --input-bg: rgba(0,0,0,0.2);
-      --shadow: 0 10px 30px rgba(0,0,0,0.4);
-    }
-
-    .light-theme {
-      --bg-gradient: linear-gradient(135deg, #f0f9ff, #e0f2fe, #c7e8fc);
-      --text-color: #1e293b;
-      --card-bg: rgba(255, 255, 255, 0.85);
-      --btn-bg: #3b82f6;
-      --btn-hover: #2563eb;
-      --track-bg: rgba(59,130,246,0.1);
-      --track-border: rgba(59,130,246,0.2);
-      --track-active: rgba(59,130,246,0.25);
-      --input-bg: rgba(241,245,249,0.7);
-      --shadow: 0 6px 20px rgba(0,123,255,0.1);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: var(--bg-gradient);
-      color: var(--text-color);
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    /* === СНЕГ === */
-    #snow-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    .snowflake {
-      position: absolute;
-      background: white;
-      border-radius: 50%;
-      opacity: 0.6;
-    }
-
-    @keyframes fall-drift {
-      to { transform: translateY(100vh) translateX(var(--drift, 0px)); }
-    }
-
-    /* === ОСНОВНОЙ КОНТЕНТ === */
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      text-align: center;
-      position: relative;
-      z-index: 2;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-
-    #theme-toggle {
-      background: var(--track-bg);
-      border: 1px solid var(--track-border);
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-    }
-
-    #theme-toggle:hover {
-      background: var(--track-active);
-    }
-
-    #player-container {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      max-width: 640px;
-      margin: 15px auto;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      background: var(--card-bg);
-      backdrop-filter: blur(10px);
-    }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    #play-btn {
-      padding: 12px 28px;
-      font-size: 1.1rem;
-      background: var(--btn-bg);
-      color: white;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      margin-top: 15px;
-      box-shadow: 0 4px 12px rgba(255,107,97,0.3);
-    }
-
-    .light-theme #play-btn {
-      box-shadow: 0 4px 12px rgba(59,130,246,0.3);
-    }
-
-    #play-btn:hover {
-      background: var(--btn-hover);
-      transform: scale(1.04);
-    }
-
-    .controls {
-      margin-top: 15px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-      align-items: center;
-    }
-
-    .volume-control, .sleep-timer {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    #volume-slider {
-      width: 120px;
-      height: 6px;
-      -webkit-appearance: none;
-      background: var(--track-border);
-      border-radius: 3px;
-      outline: none;
-    }
-
-    #volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--btn-bg);
-      cursor: pointer;
-    }
-
-    #sleep-select, #custom-minutes {
-      padding: 6px 10px;
-      background: var(--input-bg);
-      color: var(--text-color);
-      border: 1px solid var(--track-border);
-      border-radius: 8px;
-      font-size: 0.95rem;
-    }
-
-    #custom-minutes {
-      width: 60px;
-      text-align: center;
-    }
-
-    #countdown {
-      margin-top: 8px;
-      font-size: 0.85rem;
-      color: #aaa;
-    }
-
-    .add-track {
-      margin: 25px 0;
-      padding: 15px;
-      background: var(--card-bg);
-      border-radius: 16px;
-      backdrop-filter: blur(8px);
-    }
-
-    #custom-url {
-      width: 100%;
-      max-width: 400px;
-      padding: 10px 14px;
-      background: var(--input-bg);
-      border: 1px solid var(--track-border);
-      border-radius: 12px;
-      color: var(--text-color);
-      font-size: 1rem;
-      margin-bottom: 10px;
-    }
-
-    #add-btn {
-      padding: 8px 20px;
-      background: var(--btn-bg);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 0.95rem;
-    }
-
-    .tracks-section {
-      margin-top: 20px;
-    }
-
-    .section-title {
-      margin: 20px 0 12px;
-      font-size: 1.1rem;
-      opacity: 0.8;
-    }
-
-    .tracks, .custom-tracks {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      padding: 0 10px;
-    }
-
-    .track-btn, .custom-track-btn {
-      padding: 8px 14px;
-      background: var(--track-bg);
-      color: var(--text-color);
-      border: 1px solid var(--track-border);
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      white-space: nowrap;
-    }
-
-    .custom-track-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-radius: 12px;
-      padding: 8px 12px;
-      max-width: 280px;
-    }
-
-    .custom-track-btn img {
-      width: 40px;
-      height: 24px;
-      object-fit: cover;
-      border-radius: 4px;
-    }
-
-    .delete-btn {
-      background: none;
-      border: none;
-      color: #ff6b6b;
-      font-size: 1.2rem;
-      cursor: pointer;
-      padding: 0;
-      margin-left: 6px;
-    }
-
-    .track-btn:hover, .track-btn.active,
-    .custom-track-btn:hover, .custom-track-btn.active {
-      background: var(--track-active);
-      border-color: var(--btn-bg);
-    }
-
-    .note {
-      margin-top: 25px;
-      font-size: 0.8rem;
-      opacity: 0.7;
-      line-height: 1.5;
-    }
-
-    /* === РЕКОМЕНДАЦИИ === */
-    #recommendations-container {
-      margin-top: 40px;
-      padding: 20px;
-    }
-
-    #recommendations-title {
-      font-size: 1.1rem;
-      margin-bottom: 15px;
-      opacity: 0.8;
-    }
-
-    #recommendations {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      padding: 0 10px;
-    }
-
-    .rec-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100px;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    .rec-item:hover {
-      transform: scale(1.05);
-    }
-
-    .rec-thumb {
-      width: 80px;
-      height: 80px;
-      border-radius: 10px;
-      object-fit: cover;
-      margin-bottom: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    .rec-title-text {
-      font-size: 0.8rem;
-      text-align: center;
-      max-width: 90px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* === КНОПКА СНЕГА === */
-    #snow-toggle {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 48px;
-      height: 48px;
-      background: rgba(30, 30, 46, 0.6);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 50%;
-      color: white;
-      font-size: 1.4rem;
-      cursor: pointer;
-      z-index: 10;
-      backdrop-filter: blur(6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .light-theme #snow-toggle {
-      background: rgba(241, 245, 249, 0.6);
-      border-color: rgba(59,130,246,0.3);
-      color: #3b82f6;
-    }
-
-    #snow-toggle:hover {
-      background: rgba(255, 107, 97, 0.4);
-    }
-
-    .light-theme #snow-toggle:hover {
-      background: rgba(59,130,246,0.2);
-    }
-
-    @media (max-width: 600px) {
-      h1 { font-size: 1.5rem; }
-      #player-container { border-radius: 12px; }
-      .track-btn { padding: 7px 12px; font-size: 0.85rem; }
-      .custom-track-btn { max-width: 220px; padding: 7px 10px; }
-      .custom-track-btn img { width: 36px; height: 22px; }
-      #play-btn { font-size: 1rem; padding: 10px 24px; }
-      .controls { flex-direction: column; gap: 12px; }
-      #volume-slider { width: 150px; }
-      #custom-url { font-size: 0.95rem; }
-      #snow-toggle { bottom: 15px; right: 15px; width: 44px; height: 44px; font-size: 1.3rem; }
-      .rec-thumb { width: 70px; height: 70px; }
-      .rec-item { width: 90px; }
-    }
-  </style>
-</head>
-<body class="dark-theme">
-  <!-- Снег -->
-  <div id="snow-container"></div>
-
-  <div class="container">
-    <header>
-      <h1>∞ Lofi Radio ❄️</h1>
-      <button id="theme-toggle" title="Сменить тему">🌓</button>
-    </header>
-
-    <div id="player-container">
-      <iframe id="lofi-player" 
-              src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&loop=1&playlist=jfKfPfyJRdk&controls=1&mute=1&enablejsapi=1"
-              allow="autoplay; encrypted-media"
-              title="Lofi Girl Radio">
-      </iframe>
-    </div>
-
-    <button id="play-btn">▶ Включить музыку</button>
-
-    <div class="controls">
-      <div class="volume-control">
-        <span>🔈</span>
-        <input type="range" id="volume-slider" min="0" max="100" value="10">
-        <span>🔊</span>
-      </div>
-
-      <div class="sleep-timer">
-        <label for="sleep-select">Таймер:</label>
-        <select id="sleep-select">
-          <option value="0">Никогда</option>
-          <option value="900">15 мин</option>
-          <option value="1800">30 мин</option>
-          <option value="2700">45 мин</option>
-          <option value="3600">60 мин</option>
-          <option value="custom">Своё время</option>
-        </select>
-        <input type="number" id="custom-minutes" min="1" max="240" value="30" placeholder="мин" style="display: none;">
-      </div>
-    </div>
-
-    <div id="countdown"></div>
-
-    <div class="add-track">
-      <h3>➕ Добавить свой стрим</h3>
-      <input type="text" id="custom-url" placeholder="Ссылка YouTube (v=...)" />
-      <br>
-      <button id="add-btn">Добавить</button>
-    </div>
-
-    <div class="tracks-section">
-      <div class="section-title">🎧 Официальные стримы</div>
-      <div class="tracks">
-        <button class="track-btn active" data-id="jfKfPfyJRdk">Study Beats</button>
-        <button class="track-btn" data-id="5qap5aO4i9A">Chillhop Radio</button>
-        <button class="track-btn" data-id="lTRiuFIWV54">Jazz & Rain</button>
-        <button class="track-btn" data-id="r4DhZUZQ0Gw">LoFi Dreams</button>
-        <button class="track-btn" data-id="IxPANmjPaek">Night Study</button>
-        <button class="track-btn" data-id="9Ny1rBqIhXI">Gaming Lofi</button>
-      </div>
-    </div>
-
-    <div class="tracks-section">
-      <div class="section-title">📁 Мои стримы</div>
-      <div class="custom-tracks" id="custom-tracks-container"></div>
-    </div>
-
-    <p class="note">Все стримы проверены и работают (12.12.2025).</p>
-  </div>
-
-  <!-- РЕКОМЕНДАЦИИ -->
-  <div id="recommendations-container">
-    <div id="recommendations-title">📌 Вам может понравиться</div>
-    <div id="recommendations">
-      <div class="rec-item" data-id="L9JqD8V6U0Y">
-        <img class="rec-thumb" src="https://img.youtube.com/vi/L9JqD8V6U0Y/mqdefault.jpg" alt="1">
-        <span class="rec-title-text">Chillhop Short</span>
-      </div>
-      <div class="rec-item" data-id="mY6S7N4qZ8o">
-        <img class="rec-thumb" src="https://img.youtube.com/vi/mY6S7N4qZ8o/mqdefault.jpg" alt="2">
-        <span class="rec-title-text">Guitar Study</span>
-      </div>
-      <div class="rec-item" data-id="XWb8WvXxJbE">
-        <img class="rec-thumb" src="https://img.youtube.com/vi/XWb8WvXxJbE/mqdefault.jpg" alt="3">
-        <span class="rec-title-text">Piano Mix</span>
-      </div>
-      <div class="rec-item" data-id="5yx6BWlEVcY">
-        <img class="rec-thumb" src="https://img.youtube.com/vi/5yx6BWlEVcY/mqdefault.jpg" alt="4">
-        <span class="rec-title-text">Anime Vibes</span>
-      </div>
-      <div class="rec-item" data-id="DyvXQ5NzXqY">
-        <img class="rec-thumb" src="https://img.youtube.com/vi/DyvXQ5NzXqY/mqdefault.jpg" alt="5">
-        <span class="rec-title-text">Chillhop Mix</span>
-      </div>
-      <div class="rec-item" data-id="7wTw9X6V9K8">
-        <img class="rec-thumb" src="https://img.youtube.com/vi/7wTw9X6V9K8/mqdefault.jpg" alt="6">
-        <span class="rec-title-text">Hip Hop Beats</span>
-      </div>
-    </div>
-  </div>
-
-  <button id="snow-toggle" title="Вкл/выкл снег">❄️</button>
-
-  <script>
-    // === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ===
-    let currentTrackId = 'jfKfPfyJRdk';
-    let isMuted = true;
-    let lastVolume = 10;
-
-    // === СНЕГ ===
-    function createSnow() {
-      const snow = document.getElementById('snow-container');
-      snow.innerHTML = '';
-      const flakes = window.innerWidth < 600 ? 80 : 150;
-      for (let i = 0; i < flakes; i++) {
-        const flake = document.createElement('div');
-        flake.className = 'snowflake';
-        const size = Math.random() * 3 + 1.5;
-        flake.style.width = `${size}px`;
-        flake.style.height = `${size}px`;
-        flake.style.left = `${Math.random() * 100}%`;
-        flake.style.opacity = Math.random() * 0.4 + 0.3;
-        flake.style.animationDuration = `${Math.random() * 8 + 4}s`;
-        flake.style.animationDelay = `${-Math.random() * 5}s`;
-        flake.style.setProperty('--drift', `${(Math.random() - 0.5) * 25}px`);
-        flake.style.animationName = 'fall-drift';
-        snow.appendChild(flake);
-      }
-    }
-
-    let snowEnabled = true;
-    document.getElementById('snow-toggle').addEventListener('click', () => {
-      const snow = document.getElementById('snow-container');
-      if (snowEnabled) {
-        snow.innerHTML = '';
-        document.getElementById('snow-toggle').textContent = '➕';
-        document.getElementById('snow-toggle').title = 'Включить снег';
-      } else {
-        createSnow();
-        document.getElementById('snow-toggle').textContent = '❄️';
-        document.getElementById('snow-toggle').title = 'Выключить снег';
-      }
-      snowEnabled = !snowEnabled;
-    });
-
-    // === ПЕРЕКЛЮЧЕНИЕ ТРЕКА ===
-    function switchTrack(videoId) {
-      currentTrackId = videoId;
-      
-      const isStream = [
-        'jfKfPfyJRdk',
-        '5qap5aO4i9A',
-        'lTRiuFIWV54',
-        'r4DhZUZQ0Gw',
-        'IxPANmjPaek',
-        '9Ny1rBqIhXI'
-      ].includes(videoId);
-
-      const player = document.getElementById('lofi-player');
-      if (isStream) {
-        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=1&enablejsapi=1`;
-      } else {
-        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&enablejsapi=1`;
-      }
-
-      // Обновляем активные кнопки
-      document.querySelectorAll('.track-btn, .custom-track-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      const activeBtn = document.querySelector(`[data-id="${videoId}"]`);
-      if (activeBtn) activeBtn.classList.add('active');
-
-      // Если музыка уже играет — сразу воспроизводим
-      if (!isMuted) {
-        setTimeout(() => {
-          player.contentWindow.postMessage(JSON.stringify({event:'command',func:'playVideo'}), '*');
-          player.contentWindow.postMessage(JSON.stringify({event:'command',func:'setVolume',args:[lastVolume]}), '*');
-        }, 800);
-      } else {
-        document.getElementById('play-btn').style.display = 'inline-block';
-      }
-    }
-
-    // === ОФИЦИАЛЬНЫЕ ТРЕКИ ===
-    document.querySelectorAll('.track-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.dataset.id;
-        switchTrack(id);
-      });
-    });
-
-    // === РЕКОМЕНДАЦИИ ===
-    document.querySelectorAll('.rec-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const id = item.dataset.id;
-        switchTrack(id);
-      });
-    });
-
-    // === ТЕМА ===
-    const body = document.body;
-    const themeToggle = document.getElementById('theme-toggle');
-    const savedTheme = localStorage.getItem('lofi-theme') || 'dark';
-    
-    if (savedTheme === 'light') {
-      body.className = 'light-theme';
-      themeToggle.textContent = '🌙';
-    }
-
-    themeToggle.addEventListener('click', () => {
-      body.className = body.className === 'dark-theme' ? 'light-theme' : 'dark-theme';
-      localStorage.setItem('lofi-theme', body.className);
-      themeToggle.textContent = body.className === 'dark-theme' ? '🌓' : '🌙';
-    });
-
-    // === ПЛЕЕР ===
-    const player = document.getElementById('lofi-player');
-    const playBtn = document.getElementById('play-btn');
-    const volSlider = document.getElementById('volume-slider');
-
-    playBtn.addEventListener('click', () => {
-      isMuted = false;
-      lastVolume = parseInt(volSlider.value) || 10;
-
-      const isStream = [
-        'jfKfPfyJRdk','5qap5aO4i9A','lTRiuFIWV54','r4DhZUZQ0Gw','IxPANmjPaek','9Ny1rBqIhXI'
-      ].includes(currentTrackId);
-
-      if (isStream) {
-        player.src = `https://www.youtube.com/embed/${currentTrackId}?autoplay=1&loop=1&playlist=${currentTrackId}&controls=1&enablejsapi=1`;
-      } else {
-        player.src = `https://www.youtube.com/embed/${currentTrackId}?autoplay=1&controls=1&enablejsapi=1`;
-      }
-
-      setTimeout(() => {
-        player.contentWindow.postMessage(JSON.stringify({event:'command',func:'playVideo'}), '*');
-        player.contentWindow.postMessage(JSON.stringify({event:'command',func:'setVolume',args:[lastVolume]}), '*');
-        playBtn.style.display = 'none';
-      }, 800);
-    });
-
-    volSlider.addEventListener('input', () => {
-      lastVolume = volSlider.value;
-      if (!isMuted) {
-        player.contentWindow.postMessage(JSON.stringify({
-          event: 'command',
-          func: 'setVolume',
-          args: [lastVolume]
-        }), '*');
-      }
-    });
-
-    // === ТАЙМЕР СНА ===
-    let endTime = null;
-    const sleepSelect = document.getElementById('sleep-select');
-    const customMin = document.getElementById('custom-minutes');
-    const countdown = document.getElementById('countdown');
-
-    function formatTime(seconds) {
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    }
-
-    function updateCountdown() {
-      if (!endTime) return;
-      const diff = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
-      if (diff <= 0) {
-        player.contentWindow.postMessage(JSON.stringify({event:'command',func:'stopVideo'}), '*');
-        countdown.textContent = '💤 Музыка выключена по таймеру';
-        endTime = null;
-        return;
-      }
-      countdown.textContent = `💤 Выключится через: ${formatTime(diff)}`;
-      setTimeout(updateCountdown, 1000);
-    }
-
-    sleepSelect.addEventListener('change', () => {
-      const sec = parseInt(sleepSelect.value);
-      if (sec === 0) {
-        endTime = null;
-        countdown.textContent = '';
-      } else if (isNaN(sec)) {
-        customMin.style.display = 'inline-block';
-        endTime = Date.now() + (parseInt(customMin.value) || 30) * 60000;
-      } else {
-        customMin.style.display = 'none';
-        endTime = Date.now() + sec * 1000;
-      }
-      updateCountdown();
-    });
-
-    customMin.addEventListener('input', () => {
-      const mins = Math.min(240, Math.max(1, parseInt(customMin.value) || 30));
-      customMin.value = mins;
-      endTime = Date.now() + mins * 60000;
-      updateCountdown();
-    });
-
-    // === КАСТОМНЫЕ ТРЕКИ ===
-    function loadCustomTracks() {
-      const tracks = JSON.parse(localStorage.getItem('lofi-custom-tracks') || '[]');
-      const container = document.getElementById('custom-tracks-container');
-      container.innerHTML = '';
-      tracks.forEach((track, i) => {
-        const btn = document.createElement('div');
-        btn.className = 'custom-track-btn';
-        if (track.id === currentTrackId) {
-          btn.classList.add('active');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Строительный контроль</title>
+    <style>
+        :root {
+            --primary: #7B1A2E; --primary-hover: #5A1322; --primary-light: #FDF0F3;
+            --bg-body: #F5F6F8; --bg-card: #FFFFFF; --text-main: #2C2C2C; --text-muted: #6B7280;
+            --border: #E2E5E9; --danger: #B91C1C; --success: #16A34A;
+            --shadow: 0 2px 8px rgba(0,0,0,0.06); --shadow-hover: 0 4px 16px rgba(123, 26, 46, 0.12);
         }
-        btn.innerHTML = `
-          <img src="https://img.youtube.com/vi/${track.id}/mqdefault.jpg" alt="thumb">
-          <span>${track.title}</span>
-          <button class="delete-btn" data-index="${i}">×</button>
-        `;
-        btn.dataset.id = track.id;
-        btn.addEventListener('click', e => {
-          if (!e.target.classList.contains('delete-btn')) {
-            switchTrack(track.id);
-          }
-        });
-        container.appendChild(btn);
-      });
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-body); color: var(--text-main); min-height: 100vh; touch-action: manipulation; }
+        
+        .header { background: var(--primary); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 3px 10px rgba(0,0,0,0.15); flex-wrap: wrap; gap: 10px; }
+        .header h1 { font-size: 1.2rem; color: #FFF; display: flex; align-items: center; gap: 8px; }
+        .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .stats-bar { display: flex; gap: 18px; padding: 12px 16px; background: var(--bg-card); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+        .stat-item { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .stat-value { color: var(--primary); font-weight: 700; }
+        
+        .tabs-container { background: var(--bg-card); padding: 0 16px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+        .tab { padding: 12px 16px; cursor: pointer; border: none; background: transparent; color: var(--text-muted); font-size: 0.9rem; font-weight: 500; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+        .tab:hover { color: var(--text-main); background: var(--primary-light); }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: rgba(123, 26, 46, 0.04); font-weight: 600; }
+        .tab .edit-tab-btn { opacity: 0; transition: opacity 0.2s; background: none; border: none; color: #9CA3AF; cursor: pointer; font-size: 0.85rem; padding: 6px 8px; border-radius: 6px; }
+        .tab:hover .edit-tab-btn { opacity: 1; }
+        .add-tab-btn { padding: 12px 14px; cursor: pointer; background: transparent; border: none; color: #9CA3AF; font-size: 1.4rem; }
+        .add-tab-btn:hover { color: var(--primary); }
 
-      document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.stopPropagation();
-          const i = parseInt(btn.dataset.index);
-          const t = JSON.parse(localStorage.getItem('lofi-custom-tracks') || '[]');
-          t.splice(i, 1);
-          localStorage.setItem('lofi-custom-tracks', JSON.stringify(t));
-          loadCustomTracks();
-        });
-      });
-    }
+        .btn { padding: 10px 14px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.88rem; font-weight: 600; transition: all 0.2s; display: flex; align-items: center; gap: 6px; min-height: 42px; justify-content: center; }
+        .btn-accent { background: var(--primary); color: white; border: none; }
+        .btn-accent:hover { background: var(--primary-hover); }
+        .btn-secondary { background: #F3F4F6; color: var(--text-main); border: none; }
+        .btn-secondary:hover { background: #E5E7EB; }
+        .btn-danger { background: #FEE2E2; color: var(--danger); border: 1px solid #FECACA; }
+        .btn-danger:hover { background: var(--danger); color: white; border-color: var(--danger); }
+        .btn-small { padding: 6px 10px; font-size: 0.82rem; min-height: 36px; }
+        
+        .main-content { padding: 20px 16px; max-width: 1200px; margin: 0 auto; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+        .panel-header h2 { font-size: 1.2rem; color: var(--primary); font-weight: 600; }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .card { background: var(--bg-card); border-radius: 14px; padding: 20px; border: 1px solid var(--border); transition: all 0.2s; box-shadow: var(--shadow); min-height: 150px; display: flex; flex-direction: column; }
+        .card:hover { border-color: var(--primary); box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .card-title { font-size: 1.05rem; font-weight: 600; color: var(--text-main); }
+        .card-actions { display: flex; gap: 8px; }
+        .card-action-btn { background: #F9FAFB; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; padding: 10px 12px; border-radius: 10px; font-size: 0.85rem; transition: all 0.15s; min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+        .card-action-btn:hover { background: #F3F4F6; color: var(--text-main); border-color: #D1D5DB; }
+        .card-action-btn.delete:hover { background: #FEE2E2; color: var(--danger); border-color: #FECACA; }
+        .card-body { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .nested-list { margin-top: 10px; padding-left: 12px; border-left: 2px solid var(--border); }
+        .nested-item { background: #FAFAFA; border-radius: 10px; padding: 14px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid transparent; cursor: pointer; min-height: 48px; }
+        .nested-item:hover { border-color: #D1D5DB; background: #F9FAFB; }
+        .nested-item-name { font-size: 0.9rem; color: var(--text-main); font-weight: 500; }
+        .nested-item-actions { display: flex; gap: 6px; }
+        .floor-expand .expand-icon { transition: transform 0.25s; display: inline-block; color: var(--text-muted); font-size: 0.9rem; }
+        .floor-expand .expand-icon.expanded { transform: rotate(90deg); }
+        .apartments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 10px; }
+        .apt-card { background: #FAFAFA; border-radius: 12px; padding: 16px; border: 1px solid var(--border); transition: all 0.2s; }
+        .apt-card:hover { border-color: var(--primary); background: #FFF; }
+        .apt-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .apt-card-title { font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
+        
+        .remark-input-row { display: flex; gap: 6px; margin-top: 10px; }
+        input, select { padding: 10px 12px; background: #FFFFFF; border: 1px solid var(--border); border-radius: 8px; color: var(--text-main); font-size: 0.9rem; outline: none; transition: all 0.2s; width: 100%; min-height: 42px; }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(123, 26, 46, 0.1); }
+        input::placeholder { color: #9CA3AF; }
+        .remark-item-mini { background: var(--primary-light); border-left: 3px solid var(--primary); padding: 8px 12px; margin-bottom: 6px; border-radius: 0 8px 8px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; font-size: 0.85rem; color: var(--text-main); }
+        .remark-item-mini .remark-text { flex: 1; line-height: 1.4; word-break: break-word; }
+        .remark-item-mini .remark-date { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; align-self: flex-end; }
+        .remark-delete-mini { background: none; border: none; color: #9CA3AF; cursor: pointer; font-size: 0.85rem; padding: 4px; flex-shrink: 0; }
+        .remark-delete-mini:hover { color: var(--danger); }
+        .remarks-list-mini { max-height: 140px; overflow-y: auto; margin-bottom: 8px; padding-right: 4px; }
+        
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal-overlay.show { display: flex; }
+        .modal { background: var(--bg-card); border-radius: 16px; padding: 24px; width: 92%; max-width: 400px; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0,0,0,0.15); animation: modalIn 0.25s ease; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal h3 { color: var(--primary); margin-bottom: 16px; font-size: 1.1rem; font-weight: 600; }
+        .modal-field { margin-bottom: 14px; }
+        .modal-field label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+        .modal .btn-primary { background: var(--primary); color: white; border: none; }
+        .modal .btn-secondary { background: #F3F4F6; color: var(--text-main); border: none; }
+        
+        .drawing-editor { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 2000; flex-direction: column; }
+        .drawing-editor.active { display: flex; }
+        .drawing-header { background: var(--primary); color: white; padding: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+        .drawing-toolbar { display: flex; gap: 6px; flex-wrap: wrap; }
+        .drawing-toolbar button { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; transition: all 0.2s; min-height: 40px; }
+        .drawing-toolbar button:hover, .drawing-toolbar button.active { background: #fff; color: var(--primary); border-color: #fff; }
+        .drawing-canvas-area { flex: 1; position: relative; overflow: auto; background: #1e293b; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        #drawingCanvas { max-width: 100%; max-height: 100%; box-shadow: 0 0 30px rgba(0,0,0,0.5); cursor: crosshair; touch-action: none; background: white; border-radius: 4px; }
+        .drawing-footer { padding: 12px; background: #0f172a; display: flex; justify-content: flex-end; gap: 10px; }
 
-    document.getElementById('add-btn').addEventListener('click', async () => {
-      const input = document.getElementById('custom-url').value.trim();
-      if (!input) return;
+        .badge { background: var(--primary); color: white; font-size: 0.72rem; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+        .badge.yellow { background: #F59E0B; color: #111; }
+        .badge.green { background: #10B981; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+        .empty-state .icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.5; }
+        .search-input { width: 240px; max-width: 100%; }
+        .summary-table { width: 100%; border-collapse: collapse; margin-top: 16px; background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        .summary-table th, .summary-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+        .summary-table th { background: #F9FAFB; color: var(--primary); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+        .summary-table tr:hover td { background: #FAFAFA; }
+        .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+        .summary-stats { display: flex; gap: 10px; }
+        .summary-stat { background: var(--bg-card); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); text-align: center; box-shadow: var(--shadow); }
+        .summary-stat .num { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+        .summary-stat .label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
+    </style>
+</head>
+<body>
 
-      let videoId = null;
-      const regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-      const match = input.match(regExp);
-      if (match && match[2].length === 11) {
-        videoId = match[2];
-      } else if (input.length === 11 && /^[a-zA-Z0-9_-]+$/.test(input)) {
-        videoId = input;
-      }
+<div class="header">
+    <h1><span class="icon">🏗️</span> Строительный контроль</h1>
+    <div class="header-actions">
+        <button class="btn btn-secondary btn-small" onclick="exportData()">📥 Экспорт</button>
+        <button class="btn btn-secondary btn-small" onclick="document.getElementById('importFile').click()">📤 Импорт</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+        <button class="btn btn-danger btn-small" onclick="clearAllData()">🗑️ Очистить</button>
+    </div>
+</div>
 
-      if (!videoId) {
-        alert('❌ Неверный формат ссылки');
-        return;
-      }
+<div class="stats-bar">
+    <div class="stat-item">🏠 Домов: <span class="stat-value" id="statHouses">0</span></div>
+    <div class="stat-item">🏢 Секций: <span class="stat-value" id="statSections">0</span></div>
+    <div class="stat-item">🏗️ Этажей: <span class="stat-value" id="statFloors">0</span></div>
+    <div class="stat-item">🚪 Квартир: <span class="stat-value" id="statApartments">0</span></div>
+    <div class="stat-item">⚠️ Замечаний: <span class="stat-value" id="statRemarks">0</span></div>
+</div>
 
-      const tracks = JSON.parse(localStorage.getItem('lofi-custom-tracks') || '[]');
-      if (tracks.some(t => t.id === videoId)) {
-        alert('Уже добавлено!');
-        return;
-      }
+<div class="tabs-container" id="tabsContainer">
+    <button class="add-tab-btn" onclick="addTab()" title="Добавить дом">+</button>
+</div>
 
-      try {
-        const res = await fetch(`https://www.youtube.com/oembed?url=https://youtu.be/${videoId}&format=json`);
-        const data = await res.json();
-        tracks.push({
-          id: videoId,
-          title: data.title || videoId,
-          thumbnail: `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
-        });
-        localStorage.setItem('lofi-custom-tracks', JSON.stringify(tracks));
-        loadCustomTracks();
-        document.getElementById('custom-url').value = '';
-      } catch (e) {
-        alert('Видео не найдено или приватное');
-      }
+<div class="main-content" id="mainContent"></div>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <h3 id="modalTitle">Добавить</h3>
+        <div id="modalFields"></div>
+        <div class="modal-buttons">
+            <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+            <button class="btn btn-primary" id="modalConfirmBtn" onclick="modalConfirm()">Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<div class="drawing-editor" id="drawingEditor">
+    <div class="drawing-header">
+        <span style="font-weight:600; font-size:1rem;">📐 <span id="drawingTitle">Редактор</span></span>
+        <div class="drawing-toolbar">
+            <button onclick="setDrawMode('pin')" id="btnPin" class="active">📍 Точка</button>
+            <button onclick="setDrawMode('freehand')" id="btnDraw">✏️ Линия</button>
+            <button onclick="toggleNumbering()" id="btnNum" title="Вкл/выкл нумерацию">🔢 Нум.</button>
+            <button onclick="undoLast()" title="Отменить последнее действие">↩️ Отмена</button>
+            <button onclick="clearDrawings()">🗑️ Очистить</button>
+            <button onclick="document.getElementById('blueprintInput').click()">📁 Загрузить</button>
+            <input type="file" id="blueprintInput" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
+        </div>
+    </div>
+    <div class="drawing-canvas-area">
+        <canvas id="drawingCanvas"></canvas>
+    </div>
+    <div class="drawing-footer">
+        <button class="btn btn-secondary" onclick="closeDrawingModal()">Отмена</button>
+        <button class="btn btn-primary" onclick="saveDrawing()">💾 Сохранить</button>
+    </div>
+</div>
+
+<script>
+let data = { tabs: [] };
+let activeTabId = null;
+let modalCallback = null;
+let expandedFloors = {};
+let idCounter = 0;
+
+// Drawing state
+let currentAptPaths = {};
+let drawMode = 'pin';
+let pointNumbering = false;
+let isDrawing = false;
+let currentPath = [];
+let drawingImage = null;
+let canvas, ctx;
+
+function generateId(prefix = 'id') { idCounter++; return `${prefix}_${Date.now()}_${idCounter}`; }
+function saveData() { try { localStorage.setItem('construction_control_data', JSON.stringify(data)); updateStats(); } catch (e) { alert('⚠️ Хранилище заполнено. Экспортируйте данные или удалите старые чертежи.'); } }
+function loadData() {
+    const saved = localStorage.getItem('construction_control_data');
+    if (saved) { try { data = JSON.parse(saved); const m=JSON.stringify(data).match(/_(\d+)_\d+/g); if(m)idCounter=Math.max(idCounter,m.length); } catch(e){data={tabs:[]};} }
+    if (!data.tabs.length) data.tabs.push({id:generateId('tab'),name:'Дом 1',sections:[]});
+    activeTabId = activeTabId && data.tabs.some(t=>t.id===activeTabId) ? activeTabId : data.tabs[0].id;
+    saveData(); render();
+}
+function render() { renderTabs(); renderContent(); updateStats(); }
+function renderTabs() {
+    const c=document.getElementById('tabsContainer'), b=c.querySelector('.add-tab-btn'); c.innerHTML='';
+    data.tabs.forEach(tab=>{
+        const el=document.createElement('button'); el.className=`tab ${tab.id===activeTabId?'active':''}`; el.onclick=()=>switchTab(tab.id);
+        const r=countRemarksInTab(tab);
+        el.innerHTML=`<span>${tab.name}</span> ${r>0?`<span class="badge yellow">${r}</span>`:''} <button class="edit-tab-btn" onclick="event.stopPropagation();renameTab('${tab.id}')">✏️</button> <button class="edit-tab-btn" onclick="event.stopPropagation();deleteTab('${tab.id}')">🗑️</button>`;
+        c.appendChild(el);
     });
+    const st=document.createElement('button'); st.className=`tab ${activeTabId==='__summary__'?'active':''}`; st.onclick=()=>switchTab('__summary__');
+    st.innerHTML=`<span>📊 Итоги</span> ${getAllRemarksCount()>0?`<span class="badge">${getAllRemarksCount()}</span>`:''}`;
+    c.appendChild(st); c.appendChild(b);
+}
+function renderContent() {
+    const m=document.getElementById('mainContent'); m.innerHTML='';
+    if(activeTabId==='__summary__'){renderSummaryPanel();return;}
+    const tab=data.tabs.find(t=>t.id===activeTabId); if(!tab)return;
+    const p=document.createElement('div'); p.className='tab-panel active';
+    let h=`<div class="panel-header"><h2>${tab.name} — Секции: ${tab.sections.length}</h2><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;width:100%"><input type="text" class="search-input" placeholder="🔍 Поиск..." oninput="filterApartments('${tab.id}',this.value)"><button class="btn btn-accent" onclick="showBulkAddModal('sec','${tab.id}')">+ Добавить секции</button></div></div>`;
+    if(!tab.sections.length) h+=`<div class="empty-state"><div class="icon">🏢</div><p>Нет секций. Добавьте первую.</p></div>`;
+    else { h+='<div class="cards-grid">'; tab.sections.forEach(s=>h+=renderSectionCard(tab.id,s)); h+='</div>'; }
+    p.innerHTML=h; m.appendChild(p);
+}
+function renderSectionCard(tabId,sec){
+    let h=`<div class="card"><div class="card-header"><div class="card-title">🏢 ${sec.name}</div></div><div class="card-body">
+    <button class="btn btn-secondary btn-small" onclick="showBulkAddModal('fl','${tabId}','${sec.id}')" style="width:100%">+ Добавить этажи</button>
+    <div class="card-actions">
+        <button class="card-action-btn" onclick="renameItem('sec','${tabId}','${sec.id}')">✏️ Изм.</button>
+        <button class="card-action-btn" onclick="duplicateSection('${tabId}','${sec.id}')">📋 Копия</button>
+        <button class="card-action-btn delete" onclick="deleteItem('sec','${tabId}','${sec.id}')">🗑️ Удал.</button>
+    </div>`;
+    if(sec.floors.length){
+        h+=`<div class="nested-list">`; sec.floors.forEach(fl=>{
+            const ex=expandedFloors[fl.id];
+            h+=`<div class="nested-item floor-expand" onclick="toggleFloor('${fl.id}')"><span class="expand-icon ${ex?'expanded':''}">▶</span><span class="nested-item-name">🏗️ ${fl.name}</span><span class="badge green">${fl.apartments.length}</span><div class="nested-item-actions"><button class="card-action-btn" onclick="event.stopPropagation();renameItem('fl','${tabId}','${sec.id}','${fl.id}')">✏️</button><button class="card-action-btn delete" onclick="event.stopPropagation();deleteItem('fl','${tabId}','${sec.id}','${fl.id}')">✕</button></div></div>`;
+            if(ex){
+                h+=`<div style="margin-left:20px;margin-bottom:10px;width:100%"><button class="btn btn-secondary btn-small" onclick="showBulkAddModal('apt','${tabId}','${sec.id}','${fl.id}')" style="margin-bottom:10px;width:100%">+ Добавить квартиры</button>`;
+                if(fl.apartments.length){ h+=`<div class="apartments-grid">`; fl.apartments.forEach(a=>h+=renderApartmentCard(tabId,sec.id,fl.id,a)); h+=`</div>`; }
+                else h+=`<div style="color:var(--text-muted);font-size:0.8rem;padding:10px">Нет квартир</div>`;
+                h+=`</div>`;
+            }
+        }); h+=`</div>`;
+    } else h+=`<div style="color:var(--text-muted);font-size:0.8rem;padding:10px">Нет этажей</div>`;
+    return h+`</div></div>`;
+}
+function renderApartmentCard(tabId,secId,flId,apt){
+    let h=`<div class="apt-card" data-apt-search="${apt.name.toLowerCase()}"><div class="apt-card-header"><span class="apt-card-title">🚪 ${apt.name}</span><div style="display:flex;gap:6px;align-items:center">${apt.remarks.length?`<span class="badge yellow">${apt.remarks.length}</span>`:''}<button class="card-action-btn" onclick="renameItem('apt','${tabId}','${secId}','${flId}','${apt.id}')">✏️</button><button class="card-action-btn delete" onclick="deleteItem('apt','${tabId}','${secId}','${flId}','${apt.id}')">✕</button></div></div><div class="remarks-section">`;
+    if(apt.remarks.length){
+        h+=`<div class="remarks-list-mini">`; apt.remarks.forEach(r=>h+=`<div class="remark-item-mini"><span class="remark-text">${escapeHtml(r.text)}</span><span class="remark-date">${r.date}</span><button class="remark-delete-mini" onclick="deleteRemark('${tabId}','${secId}','${flId}','${apt.id}','${r.id}')">✕</button></div>`); h+=`</div>`;
+    }
+    h+=`<div class="remark-input-row"><input type="text" class="remark-input-mini" placeholder="Замечание..." onkeydown="if(event.key==='Enter')addRemark('${tabId}','${secId}','${flId}','${apt.id}',this)"><button class="btn btn-accent btn-small" onclick="addRemark('${tabId}','${secId}','${flId}','${apt.id}',this.previousElementSibling)">+</button></div></div>`;
+    h+=`<button class="btn btn-secondary btn-small" style="width:100%;margin-top:12px" onclick="openDrawingModal('${tabId}','${secId}','${flId}','${apt.id}')">📐 Чертеж / Фото</button></div>`;
+    return h;
+}
+function renderSummaryPanel(){
+    const m=document.getElementById('mainContent'),p=document.createElement('div'); p.className='tab-panel active';
+    const arr=[]; data.tabs.forEach(t=>t.sections.forEach(s=>s.floors.forEach(f=>f.apartments.forEach(a=>a.remarks.forEach(r=>arr.push({h:t.name,s:s.name,f:f.name,a:a.name,t:r.text,d:r.date}))))));
+    let h=`<div class="summary-header"><h2>📊 Сводка замечаний</h2><div class="summary-stats"><div class="summary-stat"><div class="num">${arr.length}</div><div class="label">Всего</div></div><div class="summary-stat"><div class="num">${data.tabs.length}</div><div class="label">Домов</div></div></div></div>`;
+    if(!arr.length) h+=`<div class="empty-state"><div class="icon">✅</div><p>Замечаний нет.</p></div>`;
+    else { h+=`<table class="summary-table"><thead><tr><th>Путь</th><th>Замечание</th><th>Дата</th></tr></thead><tbody>`; arr.forEach(i=>h+=`<tr><td><div class="summary-path">🏠<span>${i.h}</span>→🏢<span>${i.s}</span>→🏗️<span>${i.f}</span>→🚪<span>${i.a}</span></div></td><td>${escapeHtml(i.t)}</td><td style="color:var(--text-muted)">${i.d}</td></tr>`); h+=`</tbody></table>`; }
+    p.innerHTML=h; m.appendChild(p);
+}
 
-    // Инициализация
-    createSnow();
-    loadCustomTracks();
-  </script>
+function switchTab(id){activeTabId=id;render();}
+function toggleFloor(id){expandedFloors[id]=!expandedFloors[id];render();}
+function filterApartments(id,q){q=q.toLowerCase().trim();document.querySelectorAll('[data-apt-search]').forEach(c=>c.style.display=(!q||c.getAttribute('data-apt-search').includes(q))?'':'none');}
+function addTab(){showInputModal('Новый дом','Дом '+(data.tabs.length+1),n=>{if(n.trim()){data.tabs.push({id:generateId('tab'),name:n.trim(),sections:[]});activeTabId=data.tabs[data.tabs.length-1].id;saveData();render();}});}
+function renameTab(id){const t=data.tabs.find(x=>x.id===id);if(!t)return;showInputModal('Переименовать дом',t.name,n=>{if(n.trim()){t.name=n.trim();saveData();render();}});}
+function deleteTab(id){if(!confirm('Удалить дом и все данные?'))return;data.tabs=data.tabs.filter(x=>x.id!==id);if(activeTabId===id&&data.tabs.length)activeTabId=data.tabs[0].id;else if(!data.tabs.length){data.tabs.push({id:generateId('tab'),name:'Дом 1',sections:[]});activeTabId=data.tabs[0].id;}saveData();render();}
+function duplicateSection(tid,sid){const t=data.tabs.find(x=>x.id===tid),s=t.sections.find(x=>x.id===sid);if(!s)return;const ns=JSON.parse(JSON.stringify(s));regenerateIds(ns);ns.name=s.name+' (копия)';t.sections.push(ns);saveData();render();}
+
+// ✅ ИСПРАВЛЕНО: Одно модальное окно с двумя полями вместо вложенных
+function showBulkAddModal(type, tabId, secId, flId) {
+    const configs = {
+        sec: { title: 'Добавить секции', baseLabel: 'Базовое название', baseDef: 'Секция', countLabel: 'Количество секций' },
+        fl: { title: 'Добавить этажи', baseLabel: 'Базовое название', baseDef: 'Этаж', countLabel: 'Количество этажей' },
+        apt: { title: 'Добавить квартиры', baseLabel: 'Базовое название', baseDef: 'Кв.', countLabel: 'Количество квартир' }
+    };
+    const cfg = configs[type];
+    const html = `
+        <div class="modal-field"><label>${cfg.baseLabel}</label><input type="text" id="modalBaseName" value="${cfg.baseDef}"></div>
+        <div class="modal-field"><label>${cfg.countLabel}</label><input type="number" id="modalCount" value="1" min="1" max="50"></div>
+    `;
+    showModalWithHtml(cfg.title, html, () => {
+        const base = document.getElementById('modalBaseName').value.trim() || cfg.baseDef;
+        const count = Math.min(Math.max(parseInt(document.getElementById('modalCount').value) || 1, 1), 50);
+
+        if (type === 'sec') {
+            const tab = data.tabs.find(t => t.id === tabId);
+            if (tab) for (let i = 1; i <= count; i++) tab.sections.push({ id: generateId('sec'), name: `${base} ${i}`, floors: [] });
+        } else if (type === 'fl') {
+            const tab = data.tabs.find(t => t.id === tabId);
+            const sec = tab?.sections.find(s => s.id === secId);
+            if (sec) for (let i = 1; i <= count; i++) {
+                const f = { id: generateId('fl'), name: `${base} ${i}`, apartments: [] };
+                sec.floors.push(f);
+                expandedFloors[f.id] = true;
+            }
+        } else if (type === 'apt') {
+            const tab = data.tabs.find(t => t.id === tabId);
+            const sec = tab?.sections.find(s => s.id === secId);
+            const fl = sec?.floors.find(f => f.id === flId);
+            if (fl) for (let i = 1; i <= count; i++) fl.apartments.push({ id: generateId('apt'), name: `${base} ${i}`, remarks: [], blueprint: { image: null, drawings: [] } });
+        }
+        saveData(); render();
+    });
+}
+
+function renameItem(type,tabId,secId,flId,aptId){const p=getPaths(type,tabId,secId,flId,aptId),item=p.apt||p.fl||p.sec;if(!item)return;showInputModal(`Переименовать ${getTypeName(type)}`,item.name,n=>{if(n.trim()){item.name=n.trim();saveData();render();}});}
+function deleteItem(type,tabId,secId,flId,aptId){if(!confirm(`Удалить ${getTypeName(type)}?`))return;const p=getPaths(type,tabId,secId,flId,aptId);if(type==='sec')p.tab.sections=p.tab.sections.filter(s=>s.id!==secId);else if(type==='fl')p.sec.floors=p.sec.floors.filter(f=>f.id!==flId);else p.fl.apartments=p.fl.apartments.filter(a=>a.id!==aptId);saveData();render();}
+function addRemark(tabId,secId,flId,aptId,el){const txt=el.value.trim();if(!txt)return;const p=getPaths('apt',tabId,secId,flId,aptId),now=new Date();p.apt.remarks.push({id:generateId('rem'),text:txt,date:now.toLocaleDateString('ru-RU')+' '+now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})});el.value='';saveData();render();}
+function deleteRemark(tabId,secId,flId,aptId,remId){const p=getPaths('apt',tabId,secId,flId,aptId);p.apt.remarks=p.apt.remarks.filter(r=>r.id!==remId);saveData();render();}
+function getPaths(type,tabId,secId,flId,aptId){const tab=data.tabs.find(t=>t.id===tabId);if(!tab)return{};if(type==='sec')return{tab};const sec=tab.sections.find(s=>s.id===secId);if(!sec)return{};if(type==='fl')return{tab,sec};const fl=sec.floors.find(f=>f.id===flId);if(!fl)return{};return{tab,sec,fl,apt:fl.apartments.find(a=>a.id===aptId)};}
+function getTypeName(t){return{sec:'секцию',fl:'этаж',apt:'квартиру'}[t];}
+function countRemarksInTab(t){let c=0;t.sections.forEach(s=>s.floors.forEach(f=>c+=f.apartments.reduce((x,y)=>x+y.remarks.length,0)));return c;}
+function getAllRemarksCount(){return data.tabs.reduce((s,t)=>s+countRemarksInTab(t),0);}
+function regenerateIds(o){o.id=generateId(o.id.split('_')[0]);if(o.floors)o.floors.forEach(f=>{f.id=generateId('fl');if(f.apartments)f.apartments.forEach(a=>{a.id=generateId('apt');a.remarks.forEach(r=>r.id=generateId('rem'))});});}
+function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+function showInputModal(title,def,cb){showModalWithHtml(title,`<div class="modal-field"><label>Значение</label><input type="text" id="modalSingleInput" value="${escapeHtml(def)}"></div>`,()=>cb(document.getElementById('modalSingleInput').value));}
+function showModalWithHtml(title,html,cb){document.getElementById('modalTitle').textContent=title;document.getElementById('modalFields').innerHTML=html;modalCallback=cb;document.getElementById('modalOverlay').classList.add('show');setTimeout(()=>document.getElementById('modalFields').querySelector('input')?.focus(),100);}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('show');modalCallback=null;}
+function modalConfirm(){if(modalCallback)modalCallback();closeModal();}
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+function updateStats(){let s=0,f=0,a=0,r=0;data.tabs.forEach(t=>{s+=t.sections.length;t.sections.forEach(sec=>{f+=sec.floors.length;sec.floors.forEach(fl=>{a+=fl.apartments.length;r+=fl.apartments.reduce((x,y)=>x+y.remarks.length,0);})});});document.getElementById('statHouses').textContent=data.tabs.length;document.getElementById('statSections').textContent=s;document.getElementById('statFloors').textContent=f;document.getElementById('statApartments').textContent=a;document.getElementById('statRemarks').textContent=r;}
+function exportData(){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`стройконтроль_${new Date().toISOString().slice(0,10)}.json`;a.click();}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.tabs&&confirm(`Импортировать ${d.tabs.length} вкладок?`)){data=d;saveData();activeTabId=data.tabs[0]?.id;render();}}catch(err){alert('Ошибка: '+err.message);}};r.readAsText(f);e.target.value='';}
+function clearAllData(){if(confirm('Удалить ВСЕ данные?')&&confirm('Точно?')){data={tabs:[]};expandedFloors={};idCounter=0;saveData();loadData();}}
+
+// ===== DRAWING ENGINE =====
+function openDrawingModal(tabId,secId,flId,aptId){
+    currentAptPaths={tabId,secId,flId,aptId};
+    const apt=getPaths('apt',tabId,secId,flId,aptId).apt;
+    if(!apt.blueprint)apt.blueprint={image:null,drawings:[]};
+    drawingImage=apt.blueprint.image?new Image():null;
+    if(drawingImage){drawingImage.onload=()=>initCanvas();drawingImage.src=apt.blueprint.image;}
+    else initCanvas();
+    document.getElementById('drawingTitle').textContent=`${apt.name} — Чертеж`;
+    document.getElementById('drawingEditor').classList.add('active');
+    setDrawMode('pin');
+}
+function closeDrawingModal(){document.getElementById('drawingEditor').classList.remove('active');render();}
+function initCanvas(){
+    canvas=document.getElementById('drawingCanvas');ctx=canvas.getContext('2d');
+    if(drawingImage){canvas.width=drawingImage.width;canvas.height=drawingImage.height;}
+    else{canvas.width=800;canvas.height=600;ctx.fillStyle='#F9FAFB';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#9CA3AF';ctx.font='20px sans-serif';ctx.textAlign='center';ctx.fillText('Загрузите фото/чертеж',400,300);}
+    redrawCanvas();setupEvents();
+}
+function redrawCanvas(){
+    if(!ctx)return;ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(drawingImage)ctx.drawImage(drawingImage,0,0,canvas.width,canvas.height);
+    const apt=getPaths('apt',currentAptPaths.tabId,currentAptPaths.secId,currentAptPaths.flId,currentAptPaths.aptId).apt;
+    const dr=apt.blueprint?.drawings||[];let cnt=0;
+    dr.forEach(d=>{
+        if(d.type==='pin'){
+            cnt++;const x=d.points[0].x*canvas.width,y=d.points[0].y*canvas.height;
+            ctx.beginPath();ctx.arc(x,y,16,0,Math.PI*2);ctx.fillStyle='#7B1A2E';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+            if(pointNumbering){ctx.fillStyle='#fff';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(cnt,x,y);}
+        }else if(d.type==='path'&&d.points.length>1){
+            ctx.beginPath();ctx.strokeStyle='#7B1A2E';ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';
+            ctx.moveTo(d.points[0].x*canvas.width,d.points[0].y*canvas.height);
+            for(let i=1;i<d.points.length;i++)ctx.lineTo(d.points[i].x*canvas.width,d.points[i].y*canvas.height);
+            ctx.stroke();
+        }
+    });
+}
+function setDrawMode(m){drawMode=m;document.getElementById('btnPin').classList.toggle('active',m==='pin');document.getElementById('btnDraw').classList.toggle('active',m==='freehand');}
+function setupEvents(){
+    const getPos=(e)=>{const r=canvas.getBoundingClientRect();return{x:((e.clientX||e.touches?.[0]?.clientX)-r.left)/r.width,y:((e.clientY||e.touches?.[0]?.clientY)-r.top)/r.height};};
+    canvas.onpointerdown=(e)=>{e.preventDefault();isDrawing=true;const p=getPos(e);if(drawMode==='pin'){const apt=getPaths('apt',...Object.values(currentAptPaths)).apt;apt.blueprint.drawings.push({type:'pin',points:[p]});redrawCanvas();}else currentPath=[p];};
+    canvas.onpointermove=(e)=>{if(!isDrawing||drawMode!=='freehand')return;e.preventDefault();currentPath.push(getPos(e));ctx.strokeStyle='#7B1A2E';ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(currentPath[currentPath.length-2].x*canvas.width,currentPath[currentPath.length-2].y*canvas.height);ctx.lineTo(currentPath[currentPath.length-1].x*canvas.width,currentPath[currentPath.length-1].y*canvas.height);ctx.stroke();};
+    canvas.onpointerup=()=>{if(isDrawing&&drawMode==='freehand'&&currentPath.length>1){const apt=getPaths('apt',...Object.values(currentAptPaths)).apt;apt.blueprint.drawings.push({type:'path',points:currentPath});currentPath=[];redrawCanvas();}isDrawing=false;};
+}
+function toggleNumbering(){pointNumbering=!pointNumbering;document.getElementById('btnNum').classList.toggle('active',pointNumbering);redrawCanvas();}
+function undoLast(){const apt=getPaths('apt',...Object.values(currentAptPaths)).apt;if(!apt?.blueprint?.drawings?.length)return;apt.blueprint.drawings.pop();redrawCanvas();saveData();}
+function clearDrawings(){if(!confirm('Очистить все отметки?'))return;const apt=getPaths('apt',...Object.values(currentAptPaths)).apt;apt.blueprint.drawings=[];redrawCanvas();saveData();}
+function handleImageUpload(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{const img=new Image();img.onload=()=>{let w=img.width,h=img.height;if(w>1200){h*=1200/w;w=1200;}canvas.width=w;canvas.height=h;drawingImage=img;redrawCanvas();};img.src=ev.target.result;};r.readAsDataURL(f);}
+function saveDrawing(){const apt=getPaths('apt',...Object.values(currentAptPaths)).apt;if(!apt.blueprint)apt.blueprint={image:null,drawings:[]};apt.blueprint.drawings=apt.blueprint.drawings||[];if(drawingImage){try{apt.blueprint.image=drawingImage.src;}catch(e){alert('Ошибка сохранения фото');}}saveData();closeDrawingModal();}
+
+loadData();
+</script>
 </body>
 </html>
